@@ -56,7 +56,7 @@ jobs:
       - name: Login to registry ${{ env.REGISTRY }}
         run: echo "$DOCKER_REGISTRY_PASSWORD" | docker login "$REGISTRY" -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
 
-      - name: Push to {{ env.REGISTRY }}
+      - name: Push to ${{ env.REGISTRY }}
         run: docker push ${{ env.IMAGE_NAME }}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
 
       - name: Autoincrement a new minor version
