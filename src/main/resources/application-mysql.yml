@@ -1,7 +1,7 @@
 spring:
   datasource:
-    username: root
-    password: changeme
+    username: ENC(mhEl1YHItboA1n3Kj47rzEE9+g+H+goDoQFxlhLoW0k=)
+    password: ENC(rZeA7ALMzRjPSJl4d5+KpDBxfBoecrLmGVnFTJKtyTw=)
     url: jdbc:mysql://localhost:13306/default?allowPublicKeyRetrieval=true&useSSL=false
   jpa:
     database: mysql

@@ -17,10 +17,11 @@ services:
     environment:
       - MYSQL_DATABASE=default
       - MYSQL_ROOT_HOST=%
-      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_ROOT_PASSWORD=tjdgns2316!
       - TZ= Asia/Seoul
     ports:
       - 13306:3306
+
   redis:
     image: redis:7.0-alpine
     command: redis-server --port 6379

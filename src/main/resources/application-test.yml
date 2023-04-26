@@ -4,6 +4,10 @@ spring:
       on-profile:
         - test
 
+  redis:
+    host: localhost
+    port: 16379
+
   flyway:
     enabled: false
 
@@ -30,6 +34,16 @@ spring:
       data-locations:
         - classpath:sql/data.sql
 
+cloud:
+  aws:
+    s3:
+      root-dir: "test/"
+
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+    bean: jasyptStringEncryptor
 
 logging:
   level:

@@ -1,15 +1,20 @@
 package com.example.codebase.jwt;
 
+import com.example.codebase.domain.auth.dto.LoginDTO;
+import com.example.codebase.domain.auth.dto.TokenResponseDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
@@ -17,32 +22,36 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class TokenProvider implements InitializingBean {
+
     private static final String AUTHORITIES_KEY = "auth";
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final String secret;
+
     private final Long tokenValidityInMilliseconds;
     private Key key;
 
     public TokenProvider(
-            @Value("${jwt.secret}") String secret,
+            AuthenticationManagerBuilder authenticationManagerBuilder, @Value("${jwt.secret}") String secret,
             @Value("${jwt.token-validity-in-seconds}") Long tokenValidityInMilliseconds) {
+        this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInMilliseconds * 1000;
     }
 
-    public Long getTokenValidityInMilliseconds() {
-        return tokenValidityInMilliseconds;
-    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Long getTokenValidityInSeconds() {
+        return this.tokenValidityInMilliseconds / 1000;
     }
 
     public String createToken(Authentication authentication) {
@@ -60,6 +69,44 @@ public class TokenProvider implements InitializingBean {
                 .setExpiration(validity)
                 .compact();
     }
+    public TokenResponseDTO generateToken(LoginDTO loginDTO) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = createToken(authentication);
+//        String refreshToken = createRefreshToken(authentication);
+
+        // Redis에 Refresh Token 캐싱
+        // redisUtil.setDataAndExpire(authentication.getName() + "_token", refreshToken, getRefreshTokenValidityInSeconds());
+
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
+        tokenResponseDTO.setAccessToken(accessToken);
+        tokenResponseDTO.setExpiresIn(getTokenValidityInSeconds());
+//        tokenResponseDTO.setRefreshToken(refreshToken);
+//        tokenResponseDTO.setRefreshExpiresIn(getRefreshTokenValidityInSeconds());
+        return tokenResponseDTO;
+    }
+
+    public TokenResponseDTO generateToken(Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = createToken(authentication);
+        // String refreshToken = createRefreshToken(authentication);
+
+        // Redis에 Refresh Token 캐싱
+        // redisUtil.setDataAndExpire(authentication.getName() + "_token", refreshToken, getRefreshTokenValidityInSeconds());
+
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
+        tokenResponseDTO.setAccessToken(accessToken);
+        tokenResponseDTO.setExpiresIn(getTokenValidityInSeconds());
+//        tokenResponseDTO.setRefreshToken(refreshToken);
+//        tokenResponseDTO.setRefreshExpiresIn(getRefreshTokenValidityInSeconds());
+        return tokenResponseDTO;
+    }
+
 
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);            // Token 값
