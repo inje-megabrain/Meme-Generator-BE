@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    image: nyang-be:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0.32
+    container_name: nyang-mysql
+    platform: linux/amd64
+    volumes:
+      - db_datas:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=nyang
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=tjdgsn23!
+      - TZ= Asia/Seoul
+    ports:
+      - 13306:3306
+
+#  redis:
+#    image: redis:7.0-alpine
+#    command: redis-server --port 6379
+#    container_name: codebase-redis
+#    labels:
+#      - "name=redis"
+#      - "mode=standalone"
+#    ports:
+#      - 16379:6379
+volumes:
+  db_datas:
