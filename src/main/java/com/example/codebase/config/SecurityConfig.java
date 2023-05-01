@@ -40,16 +40,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/configuration/**",
             "/swagger*/**",
             "/webjars/**",
-            "/swagger-resources/**"
+            "/swagger-resources/**",
+            "/images/**"
     };
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
-                .ignoring()
-                .antMatchers("/h2-console/**", "/favicon.ico")
-                .antMatchers(permitList);
-    }
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web
+//                .ignoring()
+//                .antMatchers("/h2-console/**", "/favicon.ico")
+//                .antMatchers(permitList);
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

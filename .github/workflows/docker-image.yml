@@ -10,7 +10,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: shonn/spring-hoon-codebase
+  IMAGE_NAME: shonn/nyang-be
   DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 

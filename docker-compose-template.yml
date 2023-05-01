@@ -17,7 +17,7 @@ services:
     environment:
       - MYSQL_DATABASE=default
       - MYSQL_ROOT_HOST=%
-      - MYSQL_ROOT_PASSWORD=tjdgns2316!
+      - MYSQL_ROOT_PASSWORD=test
       - TZ= Asia/Seoul
     ports:
       - 13306:3306

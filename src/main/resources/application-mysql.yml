@@ -1,8 +1,8 @@
 spring:
   datasource:
     username: ENC(mhEl1YHItboA1n3Kj47rzEE9+g+H+goDoQFxlhLoW0k=)
-    password: ENC(rZeA7ALMzRjPSJl4d5+KpDBxfBoecrLmGVnFTJKtyTw=)
-    url: jdbc:mysql://localhost:13306/default?allowPublicKeyRetrieval=true&useSSL=false
+    password: ENC(ng9CshGnX+g7fjpq/spK8FcF5R1tcUiwb1rt6JsrAts=)
+    url: jdbc:mysql://localhost:13306/nyang?allowPublicKeyRetrieval=true&useSSL=false
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
