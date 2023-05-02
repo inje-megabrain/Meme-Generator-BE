@@ -8,11 +8,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
-public class CodebaseApplication {
+public class NyangPieceApplication {
 
 
     public static void main(String[] args) {
-        SpringApplication.run(CodebaseApplication.class, args);
+        SpringApplication.run(NyangPieceApplication.class, args);
     }
 
     @Bean
