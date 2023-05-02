@@ -25,6 +25,7 @@ public class WantedCreateDTO {
                 .description(description)
                 .imageUrl(imageUrl)
                 .prize(prize)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
