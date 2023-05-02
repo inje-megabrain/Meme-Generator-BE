@@ -1,5 +1,6 @@
 package com.example.codebase.config;
-import com.example.codebase.CodebaseApplication;
+
+import com.example.codebase.NyangPieceApplication;
 import org.jasypt.encryption.StringEncryptor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,7 @@ import javax.swing.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = CodebaseApplication.class)
+@SpringBootTest(classes = NyangPieceApplication.class)
 @ActiveProfiles("test")
 class JasyptConfigTest {
 
