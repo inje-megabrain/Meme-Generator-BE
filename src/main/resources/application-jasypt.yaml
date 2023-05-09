@@ -1,5 +1,5 @@
 
 jasypt:
   encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD:hoon9901!}
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
     bean: jasyptStringEncryptor
