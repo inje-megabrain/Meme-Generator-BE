@@ -36,10 +36,13 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             String accessToken = tokenProvider.createToken(authentication);
+            String refreshToken = tokenProvider.createRefreshToken(authentication);
 
             TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
             tokenResponseDTO.setAccessToken(accessToken);
             tokenResponseDTO.setExpiresIn(tokenResponseDTO.getExpiresIn());
+            tokenResponseDTO.setRefreshToken(refreshToken);
+            tokenResponseDTO.setRefreshExpiresIn(tokenResponseDTO.getRefreshExpiresIn());
 
             return new ResponseEntity(tokenResponseDTO, HttpStatus.OK);
         } catch (RuntimeException e) {

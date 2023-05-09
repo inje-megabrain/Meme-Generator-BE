@@ -3,8 +3,10 @@ package com.example.codebase.controller;
 import com.example.codebase.domain.wanted.dto.WantedCreateDTO;
 import com.example.codebase.domain.wanted.dto.WantedPageDTO;
 import com.example.codebase.domain.wanted.dto.WantedResponseDTO;
+import com.example.codebase.domain.wanted.dto.WantedUpdateDTO;
 import com.example.codebase.domain.wanted.service.WantedService;
 import com.example.codebase.util.FileUtil;
+import com.example.codebase.util.SecurityUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,10 +41,13 @@ public class WantedController {
     }
 
     // 수배 등록
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createWanted(
             @RequestPart("dto") WantedCreateDTO dto,
-            @RequestPart("image") MultipartFile image)  {
+            @RequestPart("image") MultipartFile image) {
+        String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        dto.setUsername(loginUsername);
 
         // dto 확장자 추출
         String originalFilename = image.getOriginalFilename();
@@ -71,7 +77,7 @@ public class WantedController {
             fileOutputStream.close();
 
             dto.setImageUrl("/images/" + now + "/" + storeFileName);
-        } catch (IOException e){
+        } catch (IOException e) {
             return new ResponseEntity("이미지 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -89,5 +95,42 @@ public class WantedController {
     ) {
         WantedPageDTO wantedList = wantedService.getWantedList(page, size, sortDirection);
         return new ResponseEntity(wantedList, HttpStatus.OK);
+    }
+
+    @GetMapping("/{wantedId}")
+    public ResponseEntity getWanted(
+            @PathVariable("wantedId") Long wantedId
+    ) {
+        WantedResponseDTO wanted = wantedService.getWanted(wantedId);
+        return new ResponseEntity(wanted, HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @PutMapping("/{wantedId}")
+    public ResponseEntity updateWanted(
+            @PathVariable("wantedId") Long wantedId,
+            @RequestBody WantedUpdateDTO dto
+    ) {
+        String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        try {
+            WantedResponseDTO wanted = wantedService.updateWanted(wantedId, dto, loginUsername);
+            return new ResponseEntity(wanted, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @DeleteMapping("/{wantedId}")
+    public ResponseEntity deleteWanted(
+            @PathVariable("wantedId") Long wantedId
+    ) {
+        try {
+            String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+            wantedService.deleteWanted(wantedId, loginUsername);
+            return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }
