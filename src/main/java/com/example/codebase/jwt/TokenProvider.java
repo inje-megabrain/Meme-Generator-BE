@@ -2,10 +2,10 @@ package com.example.codebase.jwt;
 
 import com.example.codebase.domain.auth.dto.LoginDTO;
 import com.example.codebase.domain.auth.dto.TokenResponseDTO;
+import com.example.codebase.util.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,14 +33,20 @@ public class TokenProvider implements InitializingBean {
     private final String secret;
 
     private final Long tokenValidityInMilliseconds;
+    private final Long refreshTokenValidityInMilliseconds;
+    private final RedisUtil redisUtil;
     private Key key;
 
     public TokenProvider(
-            AuthenticationManagerBuilder authenticationManagerBuilder, @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity-in-seconds}") Long tokenValidityInMilliseconds) {
+            AuthenticationManagerBuilder authenticationManagerBuilder,
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.token-validity-in-seconds}") Long tokenValidityInMilliseconds,
+            @Value("${jwt.refresh-token-validity-in-seconds}") Long refreshTokenValidityInMilliseconds, RedisUtil redisUtil) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInMilliseconds * 1000;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds * 1000;
+        this.redisUtil = redisUtil;
     }
 
 
@@ -52,6 +58,10 @@ public class TokenProvider implements InitializingBean {
 
     private Long getTokenValidityInSeconds() {
         return this.tokenValidityInMilliseconds / 1000;
+    }
+
+    private Long getRefreshTokenValidityInSeconds() {
+        return this.refreshTokenValidityInMilliseconds / 1000 ;
     }
 
     public String createToken(Authentication authentication) {
@@ -69,6 +79,20 @@ public class TokenProvider implements InitializingBean {
                 .setExpiration(validity)
                 .compact();
     }
+
+    public String createRefreshToken(Authentication authentication) {
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setSubject(authentication.getName())
+                .claim("typ", "refresh")
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+    }
+
     public TokenResponseDTO generateToken(LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
@@ -77,16 +101,16 @@ public class TokenProvider implements InitializingBean {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = createToken(authentication);
-//        String refreshToken = createRefreshToken(authentication);
+        String refreshToken = createRefreshToken(authentication);
 
         // Redis에 Refresh Token 캐싱
-        // redisUtil.setDataAndExpire(authentication.getName() + "_token", refreshToken, getRefreshTokenValidityInSeconds());
+        redisUtil.setDataAndExpire(authentication.getName() + "_token", refreshToken, getRefreshTokenValidityInSeconds());
 
         TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
         tokenResponseDTO.setAccessToken(accessToken);
         tokenResponseDTO.setExpiresIn(getTokenValidityInSeconds());
-//        tokenResponseDTO.setRefreshToken(refreshToken);
-//        tokenResponseDTO.setRefreshExpiresIn(getRefreshTokenValidityInSeconds());
+        tokenResponseDTO.setRefreshToken(refreshToken);
+        tokenResponseDTO.setRefreshExpiresIn(getRefreshTokenValidityInSeconds());
         return tokenResponseDTO;
     }
 
@@ -94,16 +118,16 @@ public class TokenProvider implements InitializingBean {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = createToken(authentication);
-        // String refreshToken = createRefreshToken(authentication);
+         String refreshToken = createRefreshToken(authentication);
 
         // Redis에 Refresh Token 캐싱
-        // redisUtil.setDataAndExpire(authentication.getName() + "_token", refreshToken, getRefreshTokenValidityInSeconds());
+        redisUtil.setDataAndExpire(authentication.getName() + "_token", refreshToken, getRefreshTokenValidityInSeconds());
 
         TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
         tokenResponseDTO.setAccessToken(accessToken);
         tokenResponseDTO.setExpiresIn(getTokenValidityInSeconds());
-//        tokenResponseDTO.setRefreshToken(refreshToken);
-//        tokenResponseDTO.setRefreshExpiresIn(getRefreshTokenValidityInSeconds());
+        tokenResponseDTO.setRefreshToken(refreshToken);
+        tokenResponseDTO.setRefreshExpiresIn(getRefreshTokenValidityInSeconds());
         return tokenResponseDTO;
     }
 
