@@ -3,6 +3,7 @@ package com.example.codebase.controller;
 import com.example.codebase.domain.auth.dto.LoginDTO;
 import com.example.codebase.domain.auth.dto.TokenResponseDTO;
 import com.example.codebase.jwt.TokenProvider;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,5 +49,12 @@ public class AuthController {
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    @ApiOperation(value = "토큰 재발급", notes = "토큰 재발급")
+    @PostMapping("/refresh")
+    public ResponseEntity refresh(@RequestBody String refreshToken) {
+        TokenResponseDTO responseDTO = tokenProvider.regenerateToken(refreshToken);
+        return new ResponseEntity(responseDTO, HttpStatus.OK);
     }
 }
