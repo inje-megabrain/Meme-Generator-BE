@@ -66,6 +66,13 @@ public class WantedService {
         return new WantedResponseDTO(wanted);
     }
 
+    public WantedResponseDTO updateWanted(Long wantedId, WantedUpdateDTO dto) {
+        Wanted wanted = wantedRepository.findById(wantedId).orElseThrow(() -> new IllegalArgumentException("해당 수배가 없습니다."));
+        wanted.update(dto);
+        return new WantedResponseDTO(wanted);
+    }
+
+
     public void deleteWanted(Long wantedId, String username) {
         Wanted wanted = wantedRepository.findByIdAndMember_Username(wantedId, username).orElseThrow(() -> new IllegalArgumentException("해당 수배가 없거나 작성자가 아닙니다."));
 
@@ -76,4 +83,16 @@ public class WantedService {
 
         wantedRepository.delete(wanted);
     }
+
+    public void deleteWanted(Long wantedId) {
+        Wanted wanted = wantedRepository.findById(wantedId).orElseThrow(() -> new IllegalArgumentException("해당 수배가 없거나 작성자가 아닙니다."));
+
+        String imageUrl = "." + wanted.getImageUrl();
+        boolean delete = new File(imageUrl).delete();
+
+        if (!delete) throw new IllegalArgumentException("이미지 삭제 실패");
+
+        wantedRepository.delete(wanted);
+    }
+
 }

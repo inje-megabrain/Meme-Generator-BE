@@ -113,6 +113,10 @@ public class WantedController {
     ) {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         try {
+            if (SecurityUtil.isAdmin()) {
+                WantedResponseDTO wanted = wantedService.updateWanted(wantedId, dto);
+                return new ResponseEntity(wanted, HttpStatus.OK);
+            }
             WantedResponseDTO wanted = wantedService.updateWanted(wantedId, dto, loginUsername);
             return new ResponseEntity(wanted, HttpStatus.OK);
         } catch (RuntimeException e) {
@@ -127,6 +131,10 @@ public class WantedController {
     ) {
         try {
             String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+            if (SecurityUtil.isAdmin()) {
+                wantedService.deleteWanted(wantedId);
+                return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
+            }
             wantedService.deleteWanted(wantedId, loginUsername);
             return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
         } catch (RuntimeException e) {
