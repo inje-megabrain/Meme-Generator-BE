@@ -51,4 +51,7 @@ public class Wanted {
         this.prize = dto.getPrize();
         this.updatedAt = LocalDateTime.now();
     }
+    public String getUsername() {
+        return this.member.getUsername();
+    }
 }
