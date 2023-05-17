@@ -3,7 +3,7 @@ package com.example.codebase;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class NyangPieceApplicationTests {
+class MemeGeneratorApplicationTests {
 
 //    @Test
 //    void contextLoads() {
