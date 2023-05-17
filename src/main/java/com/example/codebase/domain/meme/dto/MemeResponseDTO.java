@@ -1,6 +1,6 @@
-package com.example.codebase.domain.wanted.dto;
+package com.example.codebase.domain.meme.dto;
 
-import com.example.codebase.domain.wanted.entity.Wanted;
+import com.example.codebase.domain.meme.entity.Meme;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,18 +9,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class WantedResponseDTO {
+public class MemeResponseDTO {
     private Long wantedId;
 
     private String name;
 
     private String username;
 
-    private String description;
-
     private String imageUrl;
-
-    private Integer prize;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
@@ -28,13 +24,11 @@ public class WantedResponseDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    public WantedResponseDTO(Wanted save) {
+    public MemeResponseDTO(Meme save) {
         this.wantedId = save.getId();
         this.name = save.getName();
         this.username = save.getUsername();
-        this.description = save.getDescription();
         this.imageUrl = save.getImageUrl();
-        this.prize = save.getPrize();
         this.createdAt = save.getCreatedAt();
         this.updatedAt = save.getUpdatedAt();
     }

@@ -1,16 +1,14 @@
 package com.example.codebase.controller;
 
-import com.example.codebase.domain.wanted.dto.WantedCreateDTO;
-import com.example.codebase.domain.wanted.dto.WantedPageDTO;
-import com.example.codebase.domain.wanted.dto.WantedResponseDTO;
-import com.example.codebase.domain.wanted.dto.WantedUpdateDTO;
-import com.example.codebase.domain.wanted.service.WantedService;
+import com.example.codebase.domain.meme.dto.MemeCreateDTO;
+import com.example.codebase.domain.meme.dto.MemePageDTO;
+import com.example.codebase.domain.meme.dto.MemeResponseDTO;
+import com.example.codebase.domain.meme.dto.MemeUpdateDTO;
+import com.example.codebase.domain.meme.service.MemeService;
 import com.example.codebase.util.FileUtil;
 import com.example.codebase.util.SecurityUtil;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,24 +25,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/wanted")
-public class WantedController {
+@RequestMapping("/api/meme")
+public class MemeController {
 
     // 수배 CRUD
 
-    private final WantedService wantedService;
+    private final MemeService memeService;
 
 
     @Autowired
-    public WantedController(WantedService wantedService) {
-        this.wantedService = wantedService;
+    public MemeController(MemeService memeService) {
+        this.memeService = memeService;
     }
 
     // 수배 등록
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity createWanted(
-            @RequestPart("dto") WantedCreateDTO dto,
+    public ResponseEntity createMeme(
+            @RequestPart("dto") MemeCreateDTO dto,
             @RequestPart("image") MultipartFile image) {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         dto.setUsername(loginUsername);
@@ -82,60 +80,60 @@ public class WantedController {
         }
 
         // 수배 등록
-        WantedResponseDTO wanted = wantedService.createWanted(dto);
-        return new ResponseEntity(wanted, HttpStatus.CREATED);
+        MemeResponseDTO meme = memeService.createMeme(dto);
+        return new ResponseEntity(meme, HttpStatus.CREATED);
     }
 
     // 수배 전체 조회
     @GetMapping
-    public ResponseEntity getWantedList(
+    public ResponseEntity getMemeList(
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
             @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
     ) {
-        WantedPageDTO wantedList = wantedService.getWantedList(page, size, sortDirection);
-        return new ResponseEntity(wantedList, HttpStatus.OK);
+        MemePageDTO memeList = memeService.getMemeList(page, size, sortDirection);
+        return new ResponseEntity(memeList, HttpStatus.OK);
     }
 
-    @GetMapping("/{wantedId}")
-    public ResponseEntity getWanted(
-            @PathVariable("wantedId") Long wantedId
+    @GetMapping("/{memeId}")
+    public ResponseEntity getMeme(
+            @PathVariable("memeId") Long memeId
     ) {
-        WantedResponseDTO wanted = wantedService.getWanted(wantedId);
-        return new ResponseEntity(wanted, HttpStatus.OK);
+        MemeResponseDTO meme = memeService.getMeme(memeId);
+        return new ResponseEntity(meme, HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
-    @PutMapping("/{wantedId}")
-    public ResponseEntity updateWanted(
-            @PathVariable("wantedId") Long wantedId,
-            @RequestBody WantedUpdateDTO dto
+    @PutMapping("/{memeId}")
+    public ResponseEntity updateMeme(
+            @PathVariable("memeId") Long memeId,
+            @RequestBody MemeUpdateDTO dto
     ) {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         try {
             if (SecurityUtil.isAdmin()) {
-                WantedResponseDTO wanted = wantedService.updateWanted(wantedId, dto);
-                return new ResponseEntity(wanted, HttpStatus.OK);
+                MemeResponseDTO meme = memeService.updateMeme(memeId, dto);
+                return new ResponseEntity(meme, HttpStatus.OK);
             }
-            WantedResponseDTO wanted = wantedService.updateWanted(wantedId, dto, loginUsername);
-            return new ResponseEntity(wanted, HttpStatus.OK);
+            MemeResponseDTO meme = memeService.updateMeme(memeId, dto, loginUsername);
+            return new ResponseEntity(meme, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
-    @DeleteMapping("/{wantedId}")
-    public ResponseEntity deleteWanted(
-            @PathVariable("wantedId") Long wantedId
+    @DeleteMapping("/{memeId}")
+    public ResponseEntity deleteMeme(
+            @PathVariable("memeId") Long memeId
     ) {
         try {
             String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
             if (SecurityUtil.isAdmin()) {
-                wantedService.deleteWanted(wantedId);
+                memeService.deleteMeme(memeId);
                 return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
             }
-            wantedService.deleteWanted(wantedId, loginUsername);
+            memeService.deleteMeme(memeId, loginUsername);
             return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);

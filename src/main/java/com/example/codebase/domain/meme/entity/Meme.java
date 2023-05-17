@@ -1,35 +1,29 @@
-package com.example.codebase.domain.wanted.entity;
+package com.example.codebase.domain.meme.entity;
 
 import com.example.codebase.domain.member.entity.Member;
-import com.example.codebase.domain.wanted.dto.WantedUpdateDTO;
+import com.example.codebase.domain.meme.dto.MemeUpdateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Table(name = "wanted")
+@Table(name = "meme")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Builder
-public class Wanted {
+public class Meme {
 
     @Id
-    @Column(name = "wanted_id")
+    @Column(name = "meme_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-
-    private String description;
-
-    @Column(name = "prize", columnDefinition = "DECIMAL(10)")
-    private Integer prize;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -45,10 +39,8 @@ public class Wanted {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public void update(WantedUpdateDTO dto) {
+    public void update(MemeUpdateDTO dto) {
         this.name = dto.getName();
-        this.description = dto.getDescription();
-        this.prize = dto.getPrize();
         this.updatedAt = LocalDateTime.now();
     }
     public String getUsername() {
