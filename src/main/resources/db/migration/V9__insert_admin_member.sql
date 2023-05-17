@@ -1,3 +1,3 @@
-INSERT INTO nyang.member (username, password, name, email, activated, created_time, oauth_provider, oauth_provider_id, picture) VALUES ('admin', '$2a$10$VzPAwQoGiUQiZIRPlQwVmu6Q4aTFP2pFRE8SQYCu1YOWQ4c5oWziq', 'admin', 'admin', 1, '2023-05-09 22:04:17', null, null, null);
-INSERT INTO nyang.member_authority (member_id, authority_name) VALUES (1, 'ROLE_ADMIN');
-INSERT INTO nyang.member_authority (member_id, authority_name) VALUES (1, 'ROLE_USER');
+INSERT INTO member (username, password, name, email, activated, created_time, oauth_provider, oauth_provider_id, picture) VALUES ('admin', '$2a$10$VzPAwQoGiUQiZIRPlQwVmu6Q4aTFP2pFRE8SQYCu1YOWQ4c5oWziq', 'admin', 'admin', 1, '2023-05-09 22:04:17', null, null, null);
+INSERT INTO member_authority (member_id, authority_name) VALUES (1, 'ROLE_ADMIN');
+INSERT INTO member_authority (member_id, authority_name) VALUES (1, 'ROLE_USER');

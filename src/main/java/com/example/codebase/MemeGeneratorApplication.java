@@ -8,10 +8,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
-public class NyangPieceApplication {
+public class MemeGeneratorApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(NyangPieceApplication.class, args);
+        SpringApplication.run(MemeGeneratorApplication.class, args);
     }
 
     @Bean
