@@ -2,6 +2,7 @@ package com.example.codebase.controller;
 
 import com.example.codebase.domain.member.dto.CreateMemberDTO;
 import com.example.codebase.domain.member.dto.MemberResponseDTO;
+import com.example.codebase.util.SecurityUtil;
 import io.swagger.annotations.ApiOperation;
 import com.example.codebase.domain.member.entity.Member;
 import com.example.codebase.domain.member.service.MemberService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@ApiOperation(value = "회원 관련 APIs" , notes = "")
+@ApiOperation(value = "회원 관련 APIs", notes = "")
 @RequestMapping("/api/member")
 public class MemberController {
 
@@ -37,9 +38,9 @@ public class MemberController {
     }
 
 
-    @ApiOperation(value = "전체 회원 조회" , notes = "등록된 전체 회원을 조회합니다.")
+    @ApiOperation(value = "전체 회원 조회", notes = "등록된 전체 회원을 조회합니다.")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity getAllMember() {
         try {
             List<MemberResponseDTO> members = memberService.getAllMember();
@@ -49,4 +50,22 @@ public class MemberController {
         }
     }
 
+    @ApiOperation(value = "회원 탈퇴", notes = "회원 탈퇴")
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @DeleteMapping("/{username}")
+    public ResponseEntity deleteMember(@PathVariable String username) {
+        try {
+            String loginUesrname = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+
+            // 관리자가 아닌 경우 자신의 계정만 삭제 가능
+            if (!loginUesrname.equals(username) && !SecurityUtil.isAdmin()) {
+                return new ResponseEntity("자신의 계정만 삭제할 수 있습니다.", HttpStatus.BAD_REQUEST);
+            }
+
+            memberService.deleteMember(username);
+            return new ResponseEntity(username + " 삭제되었습니다.", HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

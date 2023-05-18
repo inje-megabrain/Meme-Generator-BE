@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class MemeResponseDTO {
-    private Long wantedId;
+    private Long memeId;
 
     private String name;
 
@@ -25,7 +25,7 @@ public class MemeResponseDTO {
     private LocalDateTime updatedAt;
 
     public MemeResponseDTO(Meme save) {
-        this.wantedId = save.getId();
+        this.memeId = save.getId();
         this.name = save.getName();
         this.username = save.getUsername();
         this.imageUrl = save.getImageUrl();

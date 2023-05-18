@@ -38,7 +38,7 @@ public class MemeController {
         this.memeService = memeService;
     }
 
-    // 수배 등록
+    // 짤 등록
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createMeme(
@@ -79,12 +79,12 @@ public class MemeController {
             return new ResponseEntity("이미지 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // 수배 등록
+        // 짤 등록
         MemeResponseDTO meme = memeService.createMeme(dto);
         return new ResponseEntity(meme, HttpStatus.CREATED);
     }
 
-    // 수배 전체 조회
+    // 짤 전체 조회
     @GetMapping
     public ResponseEntity getMemeList(
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
@@ -101,6 +101,17 @@ public class MemeController {
     ) {
         MemeResponseDTO meme = memeService.getMeme(memeId);
         return new ResponseEntity(meme, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity getMemberMeme(
+            @PathVariable("username") String username,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
+    ) {
+        MemePageDTO memeList = memeService.getMemberMeme(username, page, size, sortDirection);
+        return new ResponseEntity(memeList, HttpStatus.OK);
     }
 
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")

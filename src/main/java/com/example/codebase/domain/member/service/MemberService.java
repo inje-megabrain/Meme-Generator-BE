@@ -88,4 +88,12 @@ public class MemberService {
                 .map(MemberResponseDTO::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteMember(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        memberRepository.delete(member);
+    }
 }

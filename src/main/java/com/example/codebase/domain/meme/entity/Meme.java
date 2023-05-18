@@ -28,6 +28,9 @@ public class Meme {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private MemeType type;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;

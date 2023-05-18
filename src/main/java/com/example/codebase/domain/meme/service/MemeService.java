@@ -99,4 +99,17 @@ public class MemeService {
         memeRepository.delete(meme);
     }
 
+    public MemePageDTO getMemberMeme(String username, int page, int size, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        Page<Meme> memePage = memeRepository.findAllByUsername(username, pageRequest);
+        PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
+
+        List<MemeResponseDTO> all = memePage.stream()
+                .map(MemeResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return MemePageDTO.of(all, pageInfo);
+    }
 }
