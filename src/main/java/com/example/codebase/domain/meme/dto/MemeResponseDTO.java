@@ -18,6 +18,8 @@ public class MemeResponseDTO {
 
     private String imageUrl;
 
+    private String type;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -29,6 +31,7 @@ public class MemeResponseDTO {
         this.name = save.getName();
         this.username = save.getUsername();
         this.imageUrl = save.getImageUrl();
+        this.type = save.getType().toString();
         this.createdAt = save.getCreatedAt();
         this.updatedAt = save.getUpdatedAt();
     }
