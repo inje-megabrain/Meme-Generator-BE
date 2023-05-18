@@ -13,14 +13,19 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class MemberResponseDTO {
+
     private String username;
+
     private String name;
+
     private String email;
+
     private Optional<String> picture;
+
     private Optional<String> oauthProvider;
-    private Optional<String> oauthProviderId;
+
     private boolean activated;
-    private Set<AuthorityDto> authrities;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
@@ -31,16 +36,15 @@ public class MemberResponseDTO {
         dto.setEmail(member.getEmail());
         dto.setPicture(Optional.ofNullable(member.getPicture()));
         dto.setOauthProvider(Optional.ofNullable(String.valueOf(member.getOauthProvider())));
-        dto.setOauthProviderId(Optional.ofNullable(member.getOauthProviderId()));
         dto.setActivated(member.isActivated());
-        dto.setAuthrities(
-                member.getAuthorities().stream()
-                        .map(authority ->
-                                AuthorityDto.builder()
-                                        .authorityName(authority.getAuthority().getAuthorityName())
-                                        .build()
-                        ).collect(Collectors.toSet())
-        );
+//        dto.setAuthrities(
+//                member.getAuthorities().stream()
+//                        .map(authority ->
+//                                AuthorityDto.builder()
+//                                        .authorityName(authority.getAuthority().getAuthorityName())
+//                                        .build()
+//                        ).collect(Collectors.toSet())
+//        );
         dto.setCreatedTime(member.getCreatedTime());
         return dto;
     }

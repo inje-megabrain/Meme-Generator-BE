@@ -96,4 +96,11 @@ public class MemberService {
 
         memberRepository.delete(member);
     }
+
+    public MemberResponseDTO getMember(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        return MemberResponseDTO.from(member);
+    }
 }

@@ -68,4 +68,16 @@ public class MemberController {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @ApiOperation("내 정보 조회")
+    @GetMapping("/{username}")
+    public ResponseEntity getMyInfo(@PathVariable String username) {
+        try {
+            MemberResponseDTO memberResponseDTO = memberService.getMember(username);
+            return new ResponseEntity(memberResponseDTO, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
