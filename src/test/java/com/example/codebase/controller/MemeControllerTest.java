@@ -200,6 +200,76 @@ class MemeControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockCustomUser(username = "testid2")
+    @DisplayName("작성자가 아닌데 밈 수정 시")
+    @Test
+    void 다른사람_밈_수정() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        Meme meme = Meme.builder()
+                .name("test")
+                .member(member)
+                .imageUrl("imageurl")
+                .type(MemeType.TEMPLATE)
+                .createdAt(LocalDateTime.now())
+                .build();
+        memeRepository.save(meme);
+
+
+        MemeUpdateDTO updateDTO = new MemeUpdateDTO();
+        updateDTO.setName("제목 수정");
+        // when
+        mockMvc.perform(
+                        put("/api/meme/{memeId}", meme.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDTO))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @WithMockCustomUser(username = "admin", role = "ADMIN")
+    @DisplayName("관리자가 밈 수정 시")
+    @Test
+    void 관리자_밈_수정() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        Meme meme = Meme.builder()
+                .name("test")
+                .member(member)
+                .imageUrl("imageurl")
+                .type(MemeType.TEMPLATE)
+                .createdAt(LocalDateTime.now())
+                .build();
+        memeRepository.save(meme);
+
+        MemeUpdateDTO updateDTO = new MemeUpdateDTO();
+        updateDTO.setName("관리자가 수정함");
+        // when
+        mockMvc.perform(
+                        put("/api/meme/{memeId}", meme.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDTO))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("해당 회원의 밈들 조회")
     @Test
     void 해당_회원_밈_조회() throws Exception {
@@ -281,5 +351,107 @@ class MemeControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "admin", role = "ADMIN")
+    @Test
+    @DisplayName("어드민이 밈 삭제")
+    void 어드민이_밈_삭제 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+
+        // 이미지 저장
+        String savePath = "./images/";
+        String storeFileName = UUID.randomUUID() + "." + "jpg";
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        String key = savePath + now + "/" + storeFileName; // /images/시간/파일명
+        File temp = new File(savePath + now + "/");
+
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+
+        FileOutputStream fileOutputStream = new FileOutputStream(key);
+        fileOutputStream.write("image".getBytes());
+        fileOutputStream.close();
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("/images/" + now + "/" + storeFileName)
+                    .type(MemeType.TEMPLATE)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+        mockMvc.perform(
+                        delete("/api/meme/{memeId}", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "another", role = "USER")
+    @Test
+    @DisplayName("작성자가 아닌데 밈 삭제 시")
+    void 다른사람이_밈_삭제 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+
+        // 이미지 저장
+        String savePath = "./images/";
+        String storeFileName = UUID.randomUUID() + "." + "jpg";
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        String key = savePath + now + "/" + storeFileName; // /images/시간/파일명
+        File temp = new File(savePath + now + "/");
+
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+
+        FileOutputStream fileOutputStream = new FileOutputStream(key);
+        fileOutputStream.write("image".getBytes());
+        fileOutputStream.close();
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("/images/" + now + "/" + storeFileName)
+                    .type(MemeType.TEMPLATE)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+        mockMvc.perform(
+                        delete("/api/meme/{memeId}", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }

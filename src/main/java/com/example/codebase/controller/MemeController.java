@@ -143,7 +143,7 @@ public class MemeController {
             String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
             if (SecurityUtil.isAdmin()) {
                 memeService.deleteMeme(memeId);
-                return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
+                return new ResponseEntity("관리자가 해당 밈을 삭제하였습니다.", HttpStatus.OK);
             }
             memeService.deleteMeme(memeId, loginUsername);
             return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
