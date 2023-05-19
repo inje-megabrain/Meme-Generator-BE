@@ -103,12 +103,13 @@ public class MemeController {
         return new ResponseEntity(meme, HttpStatus.OK);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/member/{username}")
     public ResponseEntity getMemberMeme(
             @PathVariable("username") String username,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
-            @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
+            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
+            @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
+            @ApiParam(value = "desc, asc", defaultValue = "desc")
+            @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
     ) {
         MemePageDTO memeList = memeService.getMemberMeme(username, page, size, sortDirection);
         return new ResponseEntity(memeList, HttpStatus.OK);

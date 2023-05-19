@@ -38,6 +38,8 @@ public class MemeService {
     public MemeResponseDTO createMeme(MemeCreateDTO dto) {
         Member member = memberRepository.findByUsername(dto.getUsername()).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
         Meme save = memeRepository.save(dto.toEntity(member));
+        member.addMeme(save);
+
         return new MemeResponseDTO(save);
     }
 
@@ -80,8 +82,12 @@ public class MemeService {
         Meme meme = memeRepository.findByIdAndMember_Username(memeId, username).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없거나 작성자가 아닙니다."));
 
         String imageUrl = "." + meme.getImageUrl();
-        boolean delete = new File(imageUrl).delete();
+        File target = new File(imageUrl);
+        if (!target.exists()) {
+            throw new IllegalArgumentException("이미지가 존재하지 않습니다.");
+        }
 
+        boolean delete = target.delete();
         if (!delete) throw new IllegalArgumentException("이미지 삭제 실패");
 
         memeRepository.delete(meme);
@@ -103,7 +109,7 @@ public class MemeService {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        Page<Meme> memePage = memeRepository.findAllByUsername(username, pageRequest);
+        Page<Meme> memePage = memeRepository.findAllByMember_Username(username, pageRequest);
         PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
 
         List<MemeResponseDTO> all = memePage.stream()

@@ -1,12 +1,15 @@
 package com.example.codebase.domain.member.entity;
 
 import com.example.codebase.domain.member.entity.oauth2.oAuthProvider;
+import com.example.codebase.domain.meme.entity.Meme;
 import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +57,10 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private Set<MemberAuthority> authorities;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Meme> memes = new ArrayList<>();
+
     public void setAuthorities(Set<MemberAuthority> authorities) {
         this.authorities = authorities;
     }
@@ -73,5 +80,9 @@ public class Member {
         this.picture = picture;
 
         return this;
+    }
+
+    public void addMeme(Meme meme) {
+        this.memes.add(meme);
     }
 }
