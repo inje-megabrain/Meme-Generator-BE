@@ -22,7 +22,7 @@ spring:
         - dev
 
 app:
-  oauth2-redirect-uri: http://localhost:3000/oauth2/redirect
+  oauth2-redirect-uri: https://meme.megabrain.kr/oauth2/redirect
 
 ---
 spring:
@@ -32,4 +32,4 @@ spring:
         - prod
 
 app:
-  oauth2-redirect-uri: http://localhost:3000/oauth2/redirect
+  oauth2-redirect-uri: https://meme.megabrain.kr/oauth2/redirect
