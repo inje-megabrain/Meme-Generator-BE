@@ -80,28 +80,18 @@ public class MemeService {
 
     @Transactional
     public void deleteMeme(Long memeId, String username) {
-        Meme meme = memeRepository.findByIdAndMember_Username(memeId, username).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없거나 작성자가 아닙니다."));
+        Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없습니다."));
+
+        if (!username.equals("admin") && !meme.getMember().getUsername().equals(username)) {
+            throw new IllegalArgumentException("작성자가 아닙니다.");
+        }
 
         String imageUrl = "." + meme.getImageUrl();
         File target = new File(imageUrl);
-        if (!target.exists()) {
-            throw new IllegalArgumentException("이미지가 존재하지 않습니다.");
+        if (target.exists()) {
+            boolean delete = target.delete();
+            if (!delete) throw new IllegalArgumentException("이미지 삭제 실패");
         }
-
-        boolean delete = target.delete();
-        if (!delete) throw new IllegalArgumentException("이미지 삭제 실패");
-
-        memeRepository.delete(meme);
-    }
-
-    @Transactional
-    public void deleteMeme(Long memeId) {
-        Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 밈이 없습니다."));
-
-        String imageUrl = "." + meme.getImageUrl();
-        boolean delete = new File(imageUrl).delete();
-
-        if (!delete) throw new IllegalArgumentException("이미지 삭제 실패");
 
         memeRepository.delete(meme);
     }
