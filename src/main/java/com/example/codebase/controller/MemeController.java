@@ -4,9 +4,12 @@ import com.example.codebase.domain.meme.dto.MemeCreateDTO;
 import com.example.codebase.domain.meme.dto.MemePageDTO;
 import com.example.codebase.domain.meme.dto.MemeResponseDTO;
 import com.example.codebase.domain.meme.dto.MemeUpdateDTO;
+import com.example.codebase.domain.meme.entity.MemeType;
 import com.example.codebase.domain.meme.service.MemeService;
 import com.example.codebase.util.FileUtil;
 import com.example.codebase.util.SecurityUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+@Api(value = "Meme APIs", description = "Meme APIs")
 @RestController
 @RequestMapping("/api/meme")
 public class MemeController {
@@ -87,11 +91,12 @@ public class MemeController {
     // 짤 전체 조회
     @GetMapping
     public ResponseEntity getMemeList(
+            @RequestParam(value = "type", defaultValue = "MEME") String type,
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
             @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
     ) {
-        MemePageDTO memeList = memeService.getMemeList(page, size, sortDirection);
+        MemePageDTO memeList = memeService.getMemeList(MemeType.from(type), page, size, sortDirection);
         return new ResponseEntity(memeList, HttpStatus.OK);
     }
 

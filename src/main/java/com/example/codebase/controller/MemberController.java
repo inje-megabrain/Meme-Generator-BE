@@ -3,6 +3,7 @@ package com.example.codebase.controller;
 import com.example.codebase.domain.member.dto.CreateMemberDTO;
 import com.example.codebase.domain.member.dto.MemberResponseDTO;
 import com.example.codebase.util.SecurityUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import com.example.codebase.domain.member.entity.Member;
 import com.example.codebase.domain.member.service.MemberService;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Api(value = "Member APIs", description = "Member APIs")
 @RestController
-@ApiOperation(value = "회원 관련 APIs", notes = "")
 @RequestMapping("/api/member")
 public class MemberController {
 

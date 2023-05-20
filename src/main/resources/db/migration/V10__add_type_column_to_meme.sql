@@ -1,2 +1,2 @@
 ALTER TABLE `meme`
-    ADD COLUMN `type` varchar(10) NOT NULL;
+    ADD COLUMN `type` varchar(10) NOT NULL DEFAULT 'TEMPLATE';

@@ -9,6 +9,7 @@ import com.example.codebase.domain.meme.dto.MemePageDTO;
 import com.example.codebase.domain.meme.dto.MemeResponseDTO;
 import com.example.codebase.domain.meme.dto.MemeUpdateDTO;
 import com.example.codebase.domain.meme.entity.Meme;
+import com.example.codebase.domain.meme.entity.MemeType;
 import com.example.codebase.domain.meme.repository.MemeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,11 +44,11 @@ public class MemeService {
         return new MemeResponseDTO(save);
     }
 
-    public MemePageDTO getMemeList(int page, int size, String sortDirection) {
+    public MemePageDTO getMemeList(MemeType type, int page, int size, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        Page<Meme> memePage = memeRepository.findAll(pageRequest);
+        Page<Meme> memePage = memeRepository.findAllByType(type, pageRequest);
         PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
 
         List<MemeResponseDTO> all = memePage.stream()
@@ -118,4 +119,5 @@ public class MemeService {
 
         return MemePageDTO.of(all, pageInfo);
     }
+
 }

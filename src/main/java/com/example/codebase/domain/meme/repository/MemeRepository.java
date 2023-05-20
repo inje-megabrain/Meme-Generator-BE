@@ -1,6 +1,7 @@
 package com.example.codebase.domain.meme.repository;
 
 import com.example.codebase.domain.meme.entity.Meme;
+import com.example.codebase.domain.meme.entity.MemeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,6 @@ public interface MemeRepository extends JpaRepository<Meme, Long>{
 
 
     Page<Meme> findAllByMember_Username(String username, Pageable pageable);
+
+    Page<Meme> findAllByType(MemeType type, Pageable pageable);
 }
