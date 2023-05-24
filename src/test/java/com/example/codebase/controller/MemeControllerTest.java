@@ -84,6 +84,7 @@ class MemeControllerTest {
         createDTO.setUsername(member.getUsername());
         createDTO.setName("test");
         createDTO.setType(MemeType.TEMPLATE.toString());
+        createDTO.setPublicFlag(true);
 
         MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
@@ -96,7 +97,7 @@ class MemeControllerTest {
                                 .accept("application/json")
                                 .characterEncoding("UTF-8")
                 )
-                .andDo(print())
+                .andDo(print()) // then
                 .andExpect(status().isCreated());
     }
 
@@ -118,6 +119,51 @@ class MemeControllerTest {
                     .member(member)
                     .imageUrl("test" + i)
                     .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+        // when
+        mockMvc.perform(
+                        get("/api/meme")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("밈 전체 공개만 조회 API가 작동한다")
+    @Test
+    void 밈_공개_전체_조회() throws Exception {
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test" + i)
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            memes.add(meme);
+        }
+        for (int i = 5; i <= 10; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test" + i)
+                    .type(MemeType.MEME)
+                    .publicFlag(false)
                     .createdAt(LocalDateTime.now())
                     .build();
             memes.add(meme);
@@ -150,6 +196,7 @@ class MemeControllerTest {
                     .member(member)
                     .imageUrl("test" + i)
                     .type(MemeType.TEMPLATE)
+                    .publicFlag(true)
                     .createdAt(LocalDateTime.now())
                     .build();
             memes.add(meme);
@@ -160,6 +207,7 @@ class MemeControllerTest {
                     .member(member)
                     .imageUrl("test" + i)
                     .type(MemeType.MEME)
+                    .publicFlag(true)
                     .createdAt(LocalDateTime.now())
                     .build();
             memes.add(meme);
@@ -194,6 +242,40 @@ class MemeControllerTest {
                     .member(member)
                     .imageUrl("test" + i)
                     .type(MemeType.TEMPLATE)
+                    .publicFlag(true)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+        // when
+        mockMvc.perform(
+                        get("/api/meme/{memeId}", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("비공개 밈 단일 조회 API가 작동한다")
+    @Test
+    void 비공개밈_단일_조회() throws Exception {
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test" + i)
+                    .type(MemeType.TEMPLATE)
+                    .publicFlag(false)
                     .createdAt(LocalDateTime.now())
                     .build();
             memes.add(meme);
@@ -333,6 +415,7 @@ class MemeControllerTest {
                     .member(member)
                     .imageUrl("test" + i)
                     .type(MemeType.TEMPLATE)
+                    .publicFlag(true)
                     .createdAt(LocalDateTime.now().minusDays(i))
                     .build();
             memes.add(meme);
@@ -384,6 +467,7 @@ class MemeControllerTest {
                     .member(member)
                     .imageUrl("/images/" + now + "/" + storeFileName)
                     .type(MemeType.TEMPLATE)
+                    .publicFlag(true)
                     .createdAt(LocalDateTime.now().minusDays(i))
                     .build();
             memes.add(meme);

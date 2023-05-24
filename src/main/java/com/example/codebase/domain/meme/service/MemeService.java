@@ -48,7 +48,7 @@ public class MemeService {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        Page<Meme> memePage = memeRepository.findAllByType(type, pageRequest);
+        Page<Meme> memePage = memeRepository.findAllByTypeAndPublicFlagIsTrue(type, pageRequest);
         PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
 
         List<MemeResponseDTO> all = memePage.stream()

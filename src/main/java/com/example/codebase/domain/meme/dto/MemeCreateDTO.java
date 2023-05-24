@@ -20,6 +20,8 @@ public class MemeCreateDTO {
 
     private String type;
 
+    private Boolean publicFlag;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String username;
 
@@ -28,6 +30,7 @@ public class MemeCreateDTO {
                 .name(name)
                 .imageUrl(imageUrl)
                 .type(MemeType.from(type))
+                .publicFlag(publicFlag)
                 .member(member)
                 .createdAt(LocalDateTime.now())
                 .build();

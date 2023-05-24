@@ -32,6 +32,9 @@ public class Meme {
     @Enumerated(EnumType.STRING)
     private MemeType type;
 
+    @Column(name = "public_flag")
+    private boolean publicFlag;
+
     @Column(name = "created_at", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 

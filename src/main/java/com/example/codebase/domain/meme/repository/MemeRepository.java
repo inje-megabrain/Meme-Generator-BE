@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface MemeRepository extends JpaRepository<Meme, Long>{
 
-
     Optional<Meme> findByIdAndMember_Username(Long id, String username);
-
 
     Page<Meme> findAllByMember_Username(String username, Pageable pageable);
 
-    Page<Meme> findAllByType(MemeType type, Pageable pageable);
+    Page<Meme> findAllByTypeAndPublicFlagIsTrue(MemeType type, Pageable pageable);
+
+
 }

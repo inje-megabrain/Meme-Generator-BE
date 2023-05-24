@@ -1,0 +1,2 @@
+ALTER TABLE `meme`
+    ADD COLUMN `public_flag` TINYINT(1) NOT NULL DEFAULT 0;

@@ -20,6 +20,8 @@ public class MemeResponseDTO {
 
     private String type;
 
+    private Boolean publicFlag;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -32,6 +34,7 @@ public class MemeResponseDTO {
         this.username = save.getUsername();
         this.imageUrl = save.getImageUrl();
         this.type = save.getType().toString();
+        this.publicFlag = save.isPublicFlag();
         this.createdAt = save.getCreatedAt();
         this.updatedAt = save.getUpdatedAt();
     }
