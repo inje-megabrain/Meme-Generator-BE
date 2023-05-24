@@ -15,4 +15,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByOauthProviderId(String oauthProviderId);
 
     void deleteByUsername(String username);
+
 }

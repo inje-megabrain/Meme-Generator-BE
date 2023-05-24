@@ -11,13 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Api(value = "Member APIs", description = "Member APIs")
 @RestController
 @RequestMapping("/api/member")
+@Validated
 public class MemberController {
 
     private MemberService memberService;
@@ -29,7 +32,7 @@ public class MemberController {
 
     @ApiOperation(value = "회원 가입", notes = "회원 가입을 합니다.")
     @PostMapping("")
-    public ResponseEntity createMember(@RequestBody CreateMemberDTO createMemberDTO) {
+    public ResponseEntity createMember(@Valid @RequestBody CreateMemberDTO createMemberDTO) {
         try {
             MemberResponseDTO memberResponseDTO = memberService.createMember(createMemberDTO);
             return new ResponseEntity(memberResponseDTO, HttpStatus.CREATED);
