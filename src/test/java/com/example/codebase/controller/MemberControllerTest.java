@@ -86,28 +86,23 @@ class MemberControllerTest {
     @DisplayName("로그인 API가 작동한다")
     @Test
     void 로그인_시() throws Exception {
-        Member member = Member.builder()
-                .email("test@test.com")
-                .name("test")
-                .username("testid")
-                .password(passwordEncoder.encode("asdf1234"))
-                .activated(true)
-                .createdTime(LocalDateTime.now())
-                .build();
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
-                .build();
+        CreateMemberDTO createMemberDTO = new CreateMemberDTO();
+        createMemberDTO.setEmail("test@test.com");
+        createMemberDTO.setName("testname");
+        createMemberDTO.setUsername("testid");
+        createMemberDTO.setPassword("asdf12345678");
 
-        MemberAuthority memberAuthority = MemberAuthority.builder()
-                .authority(authority)
-                .member(member)
-                .build();
-        member.setAuthorities(Set.of(memberAuthority));
-        memberRepository.save(member);
+        mockMvc.perform(
+                        post("/api/member")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createMemberDTO))
+                )
+                .andExpect(status().isCreated())
+                .andDo(print());
 
         LoginDTO dto = new LoginDTO();
         dto.setUsername("testid");
-        dto.setPassword("asdf1234");
+        dto.setPassword("asdf12345678");
 
         mockMvc.perform(
                         post("/api/login")
