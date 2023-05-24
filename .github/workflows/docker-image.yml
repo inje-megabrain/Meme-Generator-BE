@@ -18,8 +18,14 @@ env:
 jobs:
 
   build-dockerized-development:
-
     runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 16379:6379
+
 
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +50,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build
 
