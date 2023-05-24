@@ -26,7 +26,6 @@ jobs:
         ports:
           - 16379:6379
 
-
     steps:
       - uses: actions/checkout@v3
 
@@ -97,7 +96,7 @@ jobs:
       - name: Update Kubernetes resource
         run: |
           cd apps/meme/overlays/dev
-          kustomize edit set image ${{ env.IMAGE_NAME }}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}.dev
+          kustomize edit set image ${{ env.IMAGE_NAME }}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
           cat kustomization.yaml
 
       - name: Commit and push changes
