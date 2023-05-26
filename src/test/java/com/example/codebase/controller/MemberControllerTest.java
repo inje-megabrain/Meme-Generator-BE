@@ -70,9 +70,9 @@ class MemberControllerTest {
 
         CreateMemberDTO dto = new CreateMemberDTO();
         dto.setEmail("test@test.com");
-        dto.setName("testname");
+        dto.setName("박성훈");
         dto.setUsername("testid");
-        dto.setPassword("asdf12345678");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
@@ -90,7 +90,7 @@ class MemberControllerTest {
         createMemberDTO.setEmail("test@test.com");
         createMemberDTO.setName("testname");
         createMemberDTO.setUsername("testid");
-        createMemberDTO.setPassword("asdf12345678");
+        createMemberDTO.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
@@ -102,15 +102,15 @@ class MemberControllerTest {
 
         LoginDTO dto = new LoginDTO();
         dto.setUsername("testid");
-        dto.setPassword("asdf12345678");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     @DisplayName("회원가입 시 이메일 유효성 검증이 작동한다")
@@ -121,7 +121,7 @@ class MemberControllerTest {
         dto.setEmail("test");
         dto.setName("test");
         dto.setUsername("testid");
-        dto.setPassword("1234");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
@@ -141,7 +141,7 @@ class MemberControllerTest {
         dto.setEmail("test");
         dto.setName("asdasdasdasdasdassadasdsasdasdasdasdasadasasdsa");
         dto.setUsername("testid");
-        dto.setPassword("1234");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
@@ -160,7 +160,7 @@ class MemberControllerTest {
         dto.setEmail("test@test.com");
         dto.setName("test");
         dto.setUsername("???"); // 아이디
-        dto.setPassword("1234");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
@@ -244,7 +244,7 @@ class MemberControllerTest {
         dto.setEmail("test@test.com");
         dto.setName("test");
         dto.setUsername("a");
-        dto.setPassword("1234");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
@@ -263,7 +263,7 @@ class MemberControllerTest {
         dto.setEmail("test@test.com");
         dto.setName("test");
         dto.setUsername("aasdadasdasdasdasdaasd");
-        dto.setPassword("1234");
+        dto.setPassword("password123!");
 
         mockMvc.perform(
                         post("/api/member")
