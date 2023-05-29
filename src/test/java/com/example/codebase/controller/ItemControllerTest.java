@@ -97,7 +97,7 @@ class ItemControllerTest {
         ItemCreateDTO itemCreateDTO = new ItemCreateDTO();
         itemCreateDTO.setName("아이템1");
         itemCreateDTO.setUsername(member.getUsername());
-        itemCreateDTO.setCategory(ItemCategory.상의.toString());
+        itemCreateDTO.setCategory(ItemCategory.도구.toString());
         itemCreateDTO.setImageUrl("testurl");
 
         MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpg", "test".getBytes());
@@ -113,7 +113,7 @@ class ItemControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @DisplayName("상의 아이템 전체 조회 시")
+    @DisplayName("도구 아이템 전체 조회 시")
     @Test
     public void 아이템_전체_조회 () throws Exception {
         Authority authority = Authority.builder()
@@ -140,7 +140,7 @@ class ItemControllerTest {
             Item item = Item.builder()
                     .name("아이템" + i)
                     .member(member)
-                    .category(ItemCategory.상의)
+                    .category(ItemCategory.도구)
                     .createdAt(LocalDateTime.now().minusDays(i))
                     .imageUrl("testurl")
                     .build();
@@ -150,7 +150,7 @@ class ItemControllerTest {
             Item item = Item.builder()
                     .name("아이템" + i)
                     .member(member)
-                    .category(ItemCategory.하의)
+                    .category(ItemCategory.악세서리)
                     .createdAt(LocalDateTime.now().minusDays(i))
                     .imageUrl("testurl")
                     .build();
@@ -160,7 +160,7 @@ class ItemControllerTest {
 
         mockMvc.perform(
                         get("/api/items")
-                                .param("category", "상의")
+                                .param("category", "도구")
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
