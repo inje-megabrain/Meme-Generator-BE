@@ -84,4 +84,14 @@ public class MemberController {
         }
     }
 
+
+    @PutMapping ("/name")
+    public ResponseEntity updateName(@RequestBody String newName) {
+        try {
+            return new ResponseEntity("", HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
