@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ENC(d1ChCGaDF2tGMjE002rXx+qdF2oVprEI60fSQd3wLfz2ErukVrI+ag8n61Owpzc89+MBT3SbVFALIPCdiclhVJVYwlpAYzCCFNE8sMjXUfw/jeLfz1JVmsQH4k1oe2eS)
-            client-secret: ENC(4Yo4HEnBdqTyKuxuDGD8bp6DKX7ErZ72i7jbw3j8MSI7OrRVPKc9o6ffYwtByrMCyK/zJTqWJvEu6YhfiUv2Vw==)
+            client-id: ENC(LPramCL/Stywm0mLuO2Tx94BONYQf3VRCXsAwJlowXI+GtQ5TDQHJGTFv9Fa5X5rMJmehQq5XI9z0t3FsR/+/E2vG3Rwgx+UclLIIGtyLZv4tNrle65haXcBCLlYfZ7k)
+            client-secret: ENC(aftbK0k57QfOAo/VYLd3aM0ethOdXmwPCzHT+ffSPEhfYDvbtbsWyZw68ckqXLoydce9atYj1wI4wfx6ipQbRQ==)
             scope:
               - email
               - profile
