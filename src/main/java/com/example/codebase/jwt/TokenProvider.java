@@ -128,6 +128,13 @@ public class TokenProvider implements InitializingBean {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // Authorities 중 ROLE_GUEST 권한이 있으면 함수 종료
+        for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
+            if (grantedAuthority.getAuthority().equals("ROLE_GUEST")) {
+                throw new InvalidJwtTokenException("이메일 인증을 하지 않아 로그인 할 수 없습니다.");
+            }
+        }
+
         String accessToken = createToken(authentication);
         String refreshToken = createRefreshToken(authentication);
 

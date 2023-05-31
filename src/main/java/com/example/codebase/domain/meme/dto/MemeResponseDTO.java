@@ -14,6 +14,8 @@ public class MemeResponseDTO {
 
     private String name;
 
+    private String userid;
+
     private String username;
 
     private String imageUrl;
@@ -31,7 +33,8 @@ public class MemeResponseDTO {
     public MemeResponseDTO(Meme save) {
         this.memeId = save.getId();
         this.name = save.getName();
-        this.username = save.getUsername();
+        this.userid = save.getUsername();
+        this.username = save.getMember().getName();
         this.imageUrl = save.getImageUrl();
         this.type = save.getType().toString();
         this.publicFlag = save.isPublicFlag();

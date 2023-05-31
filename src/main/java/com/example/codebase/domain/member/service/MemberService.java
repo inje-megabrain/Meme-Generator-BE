@@ -39,9 +39,8 @@ public class MemberService {
         }
 
         Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
+                .authorityName("ROLE_GUEST")
                 .build();
-
 
         Member newMember = Member.builder()
                 .username(member.getUsername())

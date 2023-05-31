@@ -6,6 +6,7 @@ import com.example.codebase.domain.member.dto.CreateMemberDTO;
 import com.example.codebase.domain.member.entity.Authority;
 import com.example.codebase.domain.member.entity.Member;
 import com.example.codebase.domain.member.entity.MemberAuthority;
+import com.example.codebase.domain.member.repository.MemberAuthorityRepository;
 import com.example.codebase.domain.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,6 +55,8 @@ class MemberControllerTest {
     private PasswordEncoder passwordEncoder;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private MemberAuthorityRepository memberAuthorityRepository;
 
     @BeforeEach
     public void setUp() {
@@ -82,9 +85,46 @@ class MemberControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @DisplayName("로그인 API가 작동한다")
+    @DisplayName("ROLE_USER 로그인 API가 작동한다")
     @Test
     void 로그인_시() throws Exception {
+
+        Authority authority = Authority.builder()
+                .authorityName("ROLE_USER")
+                .build();
+
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test123")
+                .username("test123")
+                .password(passwordEncoder.encode("password123!"))
+                .createdTime(LocalDateTime.now())
+                .build();
+
+        MemberAuthority memberAuthority = MemberAuthority.builder()
+                .authority(authority)
+                .member(member)
+                .build();
+        member.setAuthorities(Set.of(memberAuthority));
+        memberRepository.save(member);
+        memberAuthorityRepository.save(memberAuthority);
+
+        LoginDTO dto = new LoginDTO();
+        dto.setUsername("test123");
+        dto.setPassword("password123!");
+
+        mockMvc.perform(
+                        post("/api/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("ROLE_GUEST 로그인 시")
+    @Test
+    void 게스트_로그인_시() throws Exception {
         CreateMemberDTO createMemberDTO = new CreateMemberDTO();
         createMemberDTO.setEmail("test@test.com");
         createMemberDTO.setName("testname");
@@ -109,7 +149,7 @@ class MemberControllerTest {
                                 .content(objectMapper.writeValueAsString(dto))
                 )
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isUnauthorized());
     }
 
     @DisplayName("회원가입 시 이메일 유효성 검증이 작동한다")

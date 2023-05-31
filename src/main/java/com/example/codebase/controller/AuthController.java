@@ -60,7 +60,7 @@ public class AuthController {
     public ResponseEntity emailAuth(@RequestParam String code) {
         try {
             authService.authenticateMail(code);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity("인증되었습니다",HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
