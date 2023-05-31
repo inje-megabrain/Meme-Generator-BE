@@ -127,29 +127,34 @@ public class MemeController {
             @RequestBody MemeUpdateDTO dto
     ) {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
-        try {
-            if (SecurityUtil.isAdmin()) {
-                MemeResponseDTO meme = memeService.updateMeme(memeId, dto);
-                return new ResponseEntity(meme, HttpStatus.OK);
-            }
-            MemeResponseDTO meme = memeService.updateMeme(memeId, dto, loginUsername);
+        if (SecurityUtil.isAdmin()) {
+            MemeResponseDTO meme = memeService.updateMeme(memeId, dto);
             return new ResponseEntity(meme, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+        MemeResponseDTO meme = memeService.updateMeme(memeId, dto, loginUsername);
+        return new ResponseEntity(meme, HttpStatus.OK);
     }
+
+    @ApiOperation(value = "짤 공개 여부 수정", notes = "짤 공개 여부 수정")
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @PutMapping("/{memeId}/public")
+    public ResponseEntity updateMemePublicFlag(
+            @PathVariable("memeId") Long memeId,
+            @RequestParam("flag") boolean flag
+    ) {
+        String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        MemeResponseDTO meme = memeService.updateMemePublicFlag(memeId, flag, loginUsername);
+        return new ResponseEntity(meme, HttpStatus.OK);
+    }
+
 
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
     @DeleteMapping("/{memeId}")
     public ResponseEntity deleteMeme(
             @PathVariable("memeId") Long memeId
     ) {
-        try {
-            String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
-            memeService.deleteMeme(memeId, loginUsername);
-            return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        memeService.deleteMeme(memeId, loginUsername);
+        return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
     }
 }

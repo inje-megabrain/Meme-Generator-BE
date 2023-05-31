@@ -582,4 +582,44 @@ class MemeControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("밈 공개여부 수정 시")
+    @Test
+    void 밈_공개여부_수정() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        Meme meme = Meme.builder()
+                .name("test")
+                .member(member)
+                .imageUrl("imageurl")
+                .type(MemeType.TEMPLATE)
+                .publicFlag(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        memeRepository.save(meme);
+
+        // when
+        mockMvc.perform(
+                        put("/api/meme/{memeId}/public", meme.getId())
+                                .param("flag", "true")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        put("/api/meme/{memeId}/public", meme.getId())
+                                .param("flag", "false")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
 }

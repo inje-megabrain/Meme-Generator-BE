@@ -52,4 +52,9 @@ public class Meme {
     public String getUsername() {
         return this.member.getUsername();
     }
+
+    public void updatePublicFlag(boolean flag) {
+        this.publicFlag = flag;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

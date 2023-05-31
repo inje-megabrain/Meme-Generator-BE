@@ -110,4 +110,12 @@ public class MemeService {
         return MemePageDTO.of(all, pageInfo);
     }
 
+    public MemeResponseDTO updateMemePublicFlag(Long memeId, boolean flag, String loginUsername) {
+        Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없습니다."));
+        if (!meme.getMember().getUsername().equals(loginUsername)) {
+            throw new IllegalArgumentException("작성자가 아닙니다.");
+        }
+        meme.updatePublicFlag(flag);
+        return new MemeResponseDTO(meme);
+    }
 }
