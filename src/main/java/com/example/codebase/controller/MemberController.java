@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Api(value = "Member APIs", description = "Member APIs")
@@ -40,7 +41,6 @@ public class MemberController {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @ApiOperation(value = "전체 회원 조회", notes = "등록된 전체 회원을 조회합니다.")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
@@ -85,13 +85,15 @@ public class MemberController {
     }
 
 
+    @ApiOperation(value = "이름(닉네임) 수정", notes = "내 이름을 수정합니다.")
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER')")
     @PutMapping ("/name")
-    public ResponseEntity updateName(@RequestBody String newName) {
-        try {
-            return new ResponseEntity("", HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity updateName(
+            @Pattern(regexp = "^[가-힣a-zA-Z]{2,10}$", message = "이름은 2자 이상 10자 이하의 한글 또는 영어로 입력해주세요.")
+            @RequestParam String newName) {
+            String loginUesrname = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+            memberService.updateName(loginUesrname, newName);
+            return new ResponseEntity(loginUesrname + " 에서 " + newName + "으로 수정되었습니다", HttpStatus.OK);
     }
 
 }

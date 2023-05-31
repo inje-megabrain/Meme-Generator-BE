@@ -2,33 +2,36 @@ package com.example.codebase.controller;
 
 import com.example.codebase.domain.auth.dto.LoginDTO;
 import com.example.codebase.domain.auth.dto.TokenResponseDTO;
+import com.example.codebase.domain.auth.service.AuthService;
+import com.example.codebase.domain.mail.service.MailService;
 import com.example.codebase.jwt.TokenProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Api(value = "Auth APIs", description = "Auth APIs")
+@Api(value = "Auth APIs", description = "인증 관련 APIs")
 @RestController
 @RequestMapping("/api")
 public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private final TokenProvider tokenProvider;
 
+    private final AuthService authService;
+    private final MailService mailService;
+
     @Autowired
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, AuthService authService, MailService mailService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
+        this.authService = authService;
+        this.mailService = mailService;
     }
 
     @PostMapping("/login")
@@ -47,6 +50,28 @@ public class AuthController {
         try {
             TokenResponseDTO responseDTO = tokenProvider.regenerateToken(refreshToken);
             return new ResponseEntity(responseDTO, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "이메일 인증 요청 API", notes = "이메일 인증 요청 API")
+    @GetMapping("/email/auth")
+    public ResponseEntity emailAuth(@RequestParam String code) {
+        try {
+            authService.authenticateMail(code);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "이메일 인증 전송 API", notes = "이메일 인증 전송 API")
+    @PostMapping("/email/auth")
+    public ResponseEntity sendEmailAuth(@RequestParam String email) {
+        try {
+            mailService.sendMail(email);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

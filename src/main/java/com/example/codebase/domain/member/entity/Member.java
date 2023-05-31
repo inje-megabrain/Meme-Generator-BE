@@ -54,6 +54,9 @@ public class Member {
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private Set<MemberAuthority> authorities;
 
@@ -75,14 +78,18 @@ public class Member {
                 .collect(Collectors.toList()));
     }
 
-    public Member update(String name, String picture) {
+    public void update(String name, String picture) {
         this.name = name;
         this.picture = picture;
-
-        return this;
+        this.updatedTime = LocalDateTime.now();
     }
 
     public void addMeme(Meme meme) {
         this.memes.add(meme);
+    }
+
+    public void updateName(String newName) {
+        this.name = newName;
+        this.updatedTime = LocalDateTime.now();
     }
 }

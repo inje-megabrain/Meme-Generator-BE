@@ -103,4 +103,14 @@ public class MemberService {
 
         return MemberResponseDTO.from(member);
     }
+
+    public void updateName(String loginUesrname, String newName) {
+        if (loginUesrname.equals(newName)) {
+            throw new RuntimeException("이름이 같습니다.");
+        }
+
+        Member member = memberRepository.findByUsername(loginUesrname)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        member.updateName(newName);
+    }
 }

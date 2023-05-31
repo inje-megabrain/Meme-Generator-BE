@@ -29,7 +29,7 @@ class JasyptConfigTest {
     @DisplayName("Jasypt 암호화")
     @Test
     void encrypt() {
-        String text = "tjdgns23!";
+        String text = "hell world";
         System.out.println(String.format("ENC(%s)", stringEncryptor.encrypt(text)));
     }
 

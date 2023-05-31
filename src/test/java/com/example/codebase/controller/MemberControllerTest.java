@@ -30,8 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,8 +78,8 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
-                .andExpect(status().isCreated())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
 
     @DisplayName("로그인 API가 작동한다")
@@ -97,8 +96,8 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(createMemberDTO))
                 )
-                .andExpect(status().isCreated())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isCreated());
 
         LoginDTO dto = new LoginDTO();
         dto.setUsername("testid");
@@ -128,8 +127,8 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -148,8 +147,8 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("회원가입시 아이디 검증이 작동한다")
@@ -188,9 +187,8 @@ class MemberControllerTest {
         mockMvc.perform(
                         delete("/api/member/{username}", member.getUsername())
                 )
-                .andExpect(status().isOk()) // then
-                .andDo(print()
-                );
+                .andDo(print())
+                .andExpect(status().isOk()); // then
     }
 
     @WithMockCustomUser(username = "admin", role = "ADMIN")
@@ -210,9 +208,8 @@ class MemberControllerTest {
         mockMvc.perform(
                         delete("/api/member/{username}", member.getUsername())
                 )
-                .andExpect(status().isOk()) // then
-                .andDo(print()
-                );
+                .andDo(print())
+                .andExpect(status().isOk()); // then
     }
 
     @WithMockCustomUser(username = "user", role = "USER")
@@ -232,8 +229,8 @@ class MemberControllerTest {
         mockMvc.perform(
                         delete("/api/member/{username}", member.getUsername())
                 )
-                .andExpect(status().isBadRequest()) // then
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isBadRequest()); // then
     }
 
     @DisplayName("아이디가 최소 1자 이상이어야 한다")
@@ -251,8 +248,8 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("아이디의 최대 길이를 제한한다")
@@ -270,8 +267,63 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
+    @WithMockCustomUser(username = "test123", role = "USER")
+    @DisplayName("이름 수정 시 ")
+    @Test
+    void 이름_수정_API () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("test123")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        mockMvc.perform(
+                        put("/api/member/name")
+                                .param("newName", "새로운이름")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "test123", role = "USER")
+    @DisplayName("이름 수정 유효성 검증 처리 ")
+    @Test
+    void 이름_수정_유효성검증_API () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("test123")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        mockMvc.perform(
+                        put("/api/member/name")
+                                .param("newName", "a")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                        put("/api/member/name")
+                                .param("newName", "가")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                        put("/api/member/name")
+                                .param("newName", "asdasdasdasdsad")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }

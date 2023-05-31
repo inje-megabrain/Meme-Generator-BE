@@ -1,0 +1,15 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ENC(PisTaQvDetTEen3Z29AocIjUwhSe7gbH+tRffwsl14E+U3wZdbFivw9V3BL/M3LR)
+    password: ENC(gulPKE3wQeq+l4JpNqzMdNfHIh1/V4sabkNuyw5u9ZQuhgz4UgUsECnS53T8WevP)
+    properties:
+      mail:
+        smtp:
+          socketFactory.class: javax.net.ssl.SSLSocketFactory # Use SSL
+          auth: true # Use AUTH
+          timeout: 5000 # Timeout
+          starttls:
+            enable: true # Use STARTTLS
+            required: true # Use STARTTLS
