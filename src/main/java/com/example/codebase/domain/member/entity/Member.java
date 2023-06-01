@@ -92,4 +92,9 @@ public class Member {
         this.name = newName;
         this.updatedTime = LocalDateTime.now();
     }
+
+    public void updateActivated(boolean activated) {
+        this.activated = activated;
+        this.updatedTime = LocalDateTime.now();
+    }
 }

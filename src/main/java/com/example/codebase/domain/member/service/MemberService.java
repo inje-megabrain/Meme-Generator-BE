@@ -48,7 +48,7 @@ public class MemberService {
                 .name(member.getName())
                 .email(member.getEmail())
                 .createdTime(LocalDateTime.now())
-                .activated(true)
+                .activated(false)
                 .build();
 
         MemberAuthority memberAuthority = MemberAuthority.builder()

@@ -55,19 +55,19 @@ public class AuthController {
         }
     }
 
-    @ApiOperation(value = "이메일 인증 요청 API", notes = "이메일 인증 요청 API")
-    @GetMapping("/email/auth")
+    @ApiOperation(value = "이메일 인증 코드 API", notes = "이메일 인증 코드 API")
+    @GetMapping("/auth/email")
     public ResponseEntity emailAuth(@RequestParam String code) {
         try {
             authService.authenticateMail(code);
-            return new ResponseEntity("인증되었습니다",HttpStatus.OK);
+            return new ResponseEntity("이메일 인증되었습니다",HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @ApiOperation(value = "이메일 인증 전송 API", notes = "이메일 인증 전송 API")
-    @PostMapping("/email/auth")
+    @PostMapping("/auth/email")
     public ResponseEntity sendEmailAuth(@RequestParam String email) {
         try {
             mailService.sendMail(email);
