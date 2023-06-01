@@ -23,9 +23,9 @@ public class Authority {
     @OneToMany(mappedBy = "authority")
     private Set<MemberAuthority> memberAuthorities;
 
-    public static Authority of(String roleGuest) {
+    public static Authority of(String roleName) {
         return Authority.builder()
-                .authorityName(roleGuest)
+                .authorityName(roleName)
                 .build();
     }
 }
