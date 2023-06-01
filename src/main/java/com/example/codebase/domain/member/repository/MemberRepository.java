@@ -17,6 +17,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     void deleteByUsername(String username);
     Optional<Member> findByEmail(String email);
 
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
     @Query("SELECT m FROM Member m WHERE m.email = :email and m.activated = :activated")
     Optional<Member> findByEmailAndActivated(String email, boolean activated);
 }

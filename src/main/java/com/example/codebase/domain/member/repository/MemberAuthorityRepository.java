@@ -11,5 +11,4 @@ public interface MemberAuthorityRepository extends JpaRepository<MemberAuthority
 
     Optional<MemberAuthority> findByMember(Member member);
 
-    void deleteByMemberAndAuthority_AuthorityName(Member member, String authority);
 }

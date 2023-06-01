@@ -85,6 +85,58 @@ class MemberControllerTest {
                 .andExpect(status().isCreated());
     }
 
+    @DisplayName("이미 있는 아이디로 회원가입 시")
+    @Test
+    void 이미있는_아이디_가입 () throws Exception {
+        Member member = Member.builder()
+                .email("new@new.com")
+                .name("test")
+                .username("test123")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        CreateMemberDTO dto = new CreateMemberDTO();
+        dto.setEmail("test@test.com");
+        dto.setName("박성훈");
+        dto.setUsername("test123");
+        dto.setPassword("password123!");
+
+        mockMvc.perform(
+                        post("/api/member")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("이미 있는 이메일로 회원가입 시")
+    @Test
+    void 이미있는_이메일_가입 () throws Exception {
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("test123")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        CreateMemberDTO dto = new CreateMemberDTO();
+        dto.setEmail("test@test.com");
+        dto.setName("박성훈");
+        dto.setUsername("newid123");
+        dto.setPassword("password123!");
+
+        mockMvc.perform(
+                        post("/api/member")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
 
 
     @DisplayName("회원가입 시 이메일 유효성 검증이 작동한다")

@@ -34,8 +34,12 @@ public class MemberService {
 
     @Transactional
     public MemberResponseDTO createMember(CreateMemberDTO member) {
-        if (memberRepository.findOneWithAuthoritiesByUsername(member.getUsername()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 회원입니다.");
+        if (memberRepository.existsByUsername(member.getUsername())) {
+            throw new RuntimeException("사용중인 아이디입니다.");
+        }
+
+        if (memberRepository.existsByEmail(member.getEmail())) {
+            throw new RuntimeException("사용중인 이메일입니다.");
         }
 
         Authority authority = Authority.builder()
