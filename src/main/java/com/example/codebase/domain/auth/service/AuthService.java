@@ -30,19 +30,16 @@ public class AuthService {
     public void authenticateMail(String code) {
         String email = redisUtil.getData(code)
                 .orElseThrow(() -> new RuntimeException("인증 코드가 유효하지 않습니다."));
+
         redisUtil.deleteData(code);
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
-        // ROLE_GUEST 삭제
-        memberAuthorityRepository.deleteByMemberAndAuthority_AuthorityName(member, "ROLE_GUEST");
 
-        // ROLE_USER 부여
-        MemberAuthority memberAuthority = MemberAuthority.builder()
-                .member(member)
-                .authority(Authority.of("ROLE_USER"))
-                .build();
-        member.setAuthorities(Set.of(memberAuthority));
-        memberAuthorityRepository.save(memberAuthority);
+        memberAuthorityRepository.findByMember(member)
+                .ifPresent(memberAuthority -> {
+                    memberAuthority.setAuthority(Authority.of("ROLE_USER"));
+                });
+        member.updateActivated(true);
     }
 }
