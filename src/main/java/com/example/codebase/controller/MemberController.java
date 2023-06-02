@@ -34,66 +34,50 @@ public class MemberController {
     @ApiOperation(value = "회원 가입", notes = "회원 가입을 합니다.")
     @PostMapping("")
     public ResponseEntity createMember(@Valid @RequestBody CreateMemberDTO createMemberDTO) {
-        try {
-            MemberResponseDTO memberResponseDTO = memberService.createMember(createMemberDTO);
-            return new ResponseEntity(memberResponseDTO, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        MemberResponseDTO memberResponseDTO = memberService.createMember(createMemberDTO);
+        return new ResponseEntity(memberResponseDTO, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "전체 회원 조회", notes = "등록된 전체 회원을 조회합니다.")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping()
     public ResponseEntity getAllMember() {
-        try {
-            List<MemberResponseDTO> members = memberService.getAllMember();
-            return new ResponseEntity(members, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        List<MemberResponseDTO> members = memberService.getAllMember();
+        return new ResponseEntity(members, HttpStatus.OK);
     }
 
     @ApiOperation(value = "회원 탈퇴", notes = "회원 탈퇴")
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @DeleteMapping("/{username}")
     public ResponseEntity deleteMember(@PathVariable String username) {
-        try {
-            String loginUesrname = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        String loginUesrname = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
 
-            // 관리자가 아닌 경우 자신의 계정만 삭제 가능
-            if (!loginUesrname.equals(username) && !SecurityUtil.isAdmin()) {
-                return new ResponseEntity("자신의 계정만 삭제할 수 있습니다.", HttpStatus.BAD_REQUEST);
-            }
-
-            memberService.deleteMember(username);
-            return new ResponseEntity(username + " 삭제되었습니다.", HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        // 관리자가 아닌 경우 자신의 계정만 삭제 가능
+        if (!loginUesrname.equals(username) && !SecurityUtil.isAdmin()) {
+            return new ResponseEntity("자신의 계정만 삭제할 수 있습니다.", HttpStatus.BAD_REQUEST);
         }
+
+        memberService.deleteMember(username);
+        return new ResponseEntity(username + " 삭제되었습니다.", HttpStatus.OK);
     }
 
     @ApiOperation("내 정보 조회")
     @GetMapping("/{username}")
     public ResponseEntity getMyInfo(@PathVariable String username) {
-        try {
-            MemberResponseDTO memberResponseDTO = memberService.getMember(username);
-            return new ResponseEntity(memberResponseDTO, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        MemberResponseDTO memberResponseDTO = memberService.getMember(username);
+        return new ResponseEntity(memberResponseDTO, HttpStatus.OK);
     }
 
 
     @ApiOperation(value = "이름(닉네임) 수정", notes = "내 이름을 수정합니다.")
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER')")
-    @PutMapping ("/name")
+    @PutMapping("/name")
     public ResponseEntity updateName(
             @Pattern(regexp = "^[가-힣a-zA-Z]{2,10}$", message = "이름은 2자 이상 10자 이하의 한글 또는 영어로 입력해주세요.")
             @RequestParam String newName) {
-            String loginUesrname = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
-            memberService.updateName(loginUesrname, newName);
-            return new ResponseEntity(loginUesrname + " 에서 " + newName + "으로 수정되었습니다", HttpStatus.OK);
+        String loginUesrname = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        memberService.updateName(loginUesrname, newName);
+        return new ResponseEntity(loginUesrname + " 에서 " + newName + "으로 수정되었습니다", HttpStatus.OK);
     }
 
 }

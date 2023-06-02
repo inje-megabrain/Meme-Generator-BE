@@ -36,44 +36,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity login(@Valid @RequestBody LoginDTO loginDTO) {
-        try {
-            TokenResponseDTO responseDTO = tokenProvider.generateToken(loginDTO);
-            return new ResponseEntity(responseDTO, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+        TokenResponseDTO responseDTO = tokenProvider.generateToken(loginDTO);
+        return new ResponseEntity(responseDTO, HttpStatus.OK);
     }
 
     @ApiOperation(value = "토큰 재발급", notes = "토큰 재발급")
     @PostMapping("/refresh")
     public ResponseEntity refresh(@RequestBody String refreshToken) {
-        try {
-            TokenResponseDTO responseDTO = tokenProvider.regenerateToken(refreshToken);
-            return new ResponseEntity(responseDTO, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        TokenResponseDTO responseDTO = tokenProvider.regenerateToken(refreshToken);
+        return new ResponseEntity(responseDTO, HttpStatus.OK);
     }
 
     @ApiOperation(value = "이메일 인증 코드 API", notes = "이메일 인증 코드 API")
     @GetMapping("/auth/email")
     public ResponseEntity emailAuth(@RequestParam String code) {
-        try {
-            authService.authenticateMail(code);
-            return new ResponseEntity("이메일 인증되었습니다",HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        authService.authenticateMail(code);
+        return new ResponseEntity("이메일 인증되었습니다", HttpStatus.OK);
     }
 
     @ApiOperation(value = "이메일 인증 전송 API", notes = "이메일 인증 전송 API")
     @PostMapping("/auth/email")
     public ResponseEntity sendEmailAuth(@RequestParam String email) {
-        try {
-            mailService.sendMail(email);
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        mailService.sendMail(email);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }
