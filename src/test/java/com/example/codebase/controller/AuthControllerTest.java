@@ -134,7 +134,7 @@ class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(dto))
                 )
                 .andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
     }
 
 
