@@ -106,7 +106,8 @@ public class MemberService {
 
         return MemberResponseDTO.from(member);
     }
-
+    
+    @Transactional
     public void updateName(String loginUesrname, String newName) {
         if (loginUesrname.equals(newName)) {
             throw new RuntimeException("이름이 같습니다.");
