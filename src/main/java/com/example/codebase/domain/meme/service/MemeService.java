@@ -4,12 +4,9 @@ package com.example.codebase.domain.meme.service;
 import com.example.codebase.controller.dto.PageInfo;
 import com.example.codebase.domain.member.entity.Member;
 import com.example.codebase.domain.member.repository.MemberRepository;
-import com.example.codebase.domain.meme.dto.MemeCreateDTO;
-import com.example.codebase.domain.meme.dto.MemePageDTO;
-import com.example.codebase.domain.meme.dto.MemeResponseDTO;
-import com.example.codebase.domain.meme.dto.MemeUpdateDTO;
-import com.example.codebase.domain.meme.entity.Meme;
-import com.example.codebase.domain.meme.entity.MemeType;
+import com.example.codebase.domain.meme.dto.*;
+import com.example.codebase.domain.meme.entity.*;
+import com.example.codebase.domain.meme.repository.MemeLikeMemberRepository;
 import com.example.codebase.domain.meme.repository.MemeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,8 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.PositiveOrZero;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,10 +28,13 @@ public class MemeService {
 
     private final MemberRepository memberRepository;
 
+    private final MemeLikeMemberRepository memeLikeMemberRepository;
+
     @Autowired
-    public MemeService(MemeRepository memeRepository, MemberRepository memberRepository) {
+    public MemeService(MemeRepository memeRepository, MemberRepository memberRepository, MemeLikeMemberRepository memeLikeMemberRepository) {
         this.memeRepository = memeRepository;
         this.memberRepository = memberRepository;
+        this.memeLikeMemberRepository = memeLikeMemberRepository;
     }
 
     @Transactional
@@ -44,9 +46,22 @@ public class MemeService {
         return new MemeResponseDTO(save);
     }
 
-    public MemePageDTO getMemeList(MemeType type, int page, int size, String sortDirection) {
+    public MemePageDTO getMemeList(MemeType type, int page, int size, String sortDirection, Optional<String> loginUsername) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
         PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        if (loginUsername.isPresent()) {
+            Member member = memberRepository.findByUsername(loginUsername.get())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+            Page<MemeWithIsLike> memesWithIsLiked = memeRepository.findAllByTypeAndPublicFlagIsTrueAndMemberLiked(type, member, pageRequest);
+            PageInfo pageInfo = PageInfo.of(page, size, memesWithIsLiked.getTotalPages(), memesWithIsLiked.getTotalElements());
+
+            List<MemeResponseDTO> all = memesWithIsLiked.stream()
+                    .map(memeWithIsLike -> new MemeResponseDTO(memeWithIsLike.getMeme(), memeWithIsLike.getIsLike()))
+                    .collect(Collectors.toList());
+
+            return MemePageDTO.of(all, pageInfo);
+        }
 
         Page<Meme> memePage = memeRepository.findAllByTypeAndPublicFlagIsTrue(type, pageRequest);
         PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
@@ -59,10 +74,17 @@ public class MemeService {
     }
 
     @Transactional
-    public MemeResponseDTO getMeme(Long memeId) {
+    public MemeResponseDTO getMeme(Long memeId, Optional<String> loginUsername) {
+        boolean existsById = false;
+        if (loginUsername.isPresent()) {
+            Member member = memberRepository.findByUsername(loginUsername.get())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+            existsById = memeLikeMemberRepository.existsById(new MemeLikeMemberId(memeId, member.getId()));
+        }
         Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없습니다."));
         meme.incressViewCount();
-        return new MemeResponseDTO(meme);
+
+        return new MemeResponseDTO(meme, existsById);
     }
 
     @Transactional
@@ -112,6 +134,7 @@ public class MemeService {
         return MemePageDTO.of(all, pageInfo);
     }
 
+    @Transactional
     public MemeResponseDTO updateMemePublicFlag(Long memeId, boolean flag, String loginUsername) {
         Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없습니다."));
         if (!meme.getMember().getUsername().equals(loginUsername)) {
@@ -119,5 +142,44 @@ public class MemeService {
         }
         meme.updatePublicFlag(flag);
         return new MemeResponseDTO(meme);
+    }
+
+    @Transactional
+    public MemeLikeMemberReposenDTO likeMeme(Long memeId, String loginUsername) {
+        Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없습니다."));
+
+        Member member = memberRepository.findByUsername(loginUsername).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+
+        Optional<MemeLikeMember> memeLikeMember = memeLikeMemberRepository.findById(new MemeLikeMemberId(memeId, member.getId()));
+        String status = "좋아요";
+        if (memeLikeMember.isPresent()) {
+            // 좋아요 취소
+            memeLikeMemberRepository.delete(memeLikeMember.get());
+            status = "좋아요 취소";
+        } else {
+            MemeLikeMember save = MemeLikeMember.of(meme, member);
+            memeLikeMemberRepository.save(save);
+        }
+
+        Integer LikeCount = memeLikeMemberRepository.countByMemeId(memeId);
+        meme.setLikeCount(LikeCount);
+
+        return new MemeLikeMemberReposenDTO(meme, !memeLikeMember.isPresent(), status);
+    }
+
+    public MemePageDTO getLikeMemes(String loginUsername, int page, int size, String sortDirection) {
+        Member member = memberRepository.findByUsername(loginUsername).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "likedTime");
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        Page<MemeLikeMember> memes = memeLikeMemberRepository.findByMember(member, pageRequest);
+        PageInfo pageInfo = PageInfo.of(page, size, memes.getTotalPages(), memes.getTotalElements());
+
+        List<MemeResponseDTO> all = memes.stream()
+                .map(memeLikeMember -> new MemeResponseDTO(memeLikeMember.getMeme(), true))
+                .collect(Collectors.toList());
+
+        return MemePageDTO.of(all, pageInfo);
     }
 }

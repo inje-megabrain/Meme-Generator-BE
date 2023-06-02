@@ -620,6 +620,212 @@ class MemeControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
 
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("밈 좋아요, 좋아요 취소 시")
+    @Test
+    void 밈_좋아요() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        Meme meme = Meme.builder()
+                .name("test")
+                .member(member)
+                .imageUrl("imageurl")
+                .type(MemeType.MEME)
+                .publicFlag(true)
+                .createdAt(LocalDateTime.now())
+                .build();
+        memeRepository.save(meme);
+
+        // when
+        mockMvc.perform(
+                        post("/api/meme/{memeId}/like", meme.getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        post("/api/meme/{memeId}/like", meme.getId())
+                )
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+    }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("로그인 사용자이면 좋아요 여부와 함께 밈 전체 조회")
+    @Test
+    void 로그인사용자_밈_여부와_함께_전체조회 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test_url")
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+
+        // when
+        mockMvc.perform(
+                        post("/api/meme/{memeId}/like", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        get("/api/meme")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("로그인 사용자이면 좋아요 여부와 함께 밈 단일 조회")
+    @Test
+    void 로그인사용자_밈_여부와_함께_단일조회 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test_url")
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+
+        // when
+        mockMvc.perform(
+                        post("/api/meme/{memeId}/like", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        // 좋아요한 밈
+        mockMvc.perform(
+                        get("/api/meme/{memeId}", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("로그인 사용자이면 좋아요 여부와 함께 밈 단일 조회 (좋아요 안한 밈)")
+    @Test
+    void 로그인사용자_밈_여부와_함께_단일조회2 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        Meme meme = Meme.builder()
+                .name("test")
+                .member(member)
+                .imageUrl("imageurl")
+                .type(MemeType.MEME)
+                .publicFlag(true)
+                .createdAt(LocalDateTime.now())
+                .build();
+        memeRepository.save(meme);
+
+        // 좋아요 안한 밈
+        mockMvc.perform(
+                        get("/api/meme/{memeId}", meme.getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("로그인 사용자가 좋아요 표시한 밈 전체 조회")
+    @Test
+    void 로그인사용자_좋아요한밈_전체조회 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test_url")
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+
+        // when
+        mockMvc.perform(
+                        post("/api/meme/{memeId}/like", memes.get(0).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        post("/api/meme/{memeId}/like", memes.get(1).getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+
+        // 좋아요한 밈
+        mockMvc.perform(
+                        get("/api/meme/likes")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }

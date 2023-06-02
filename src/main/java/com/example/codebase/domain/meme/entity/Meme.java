@@ -36,6 +36,10 @@ public class Meme {
     @Column(name = "view_count")
     private Integer viewCount = 0;
 
+    @Builder.Default
+    @Column(name = "like_count")
+    private Integer likeCount = 0;
+
     @Column(name = "public_flag")
     private boolean publicFlag;
 
@@ -65,4 +69,9 @@ public class Meme {
     public void incressViewCount() {
         this.viewCount++;
     }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
 }

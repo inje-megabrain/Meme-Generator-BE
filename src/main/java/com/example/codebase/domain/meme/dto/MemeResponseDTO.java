@@ -24,6 +24,10 @@ public class MemeResponseDTO {
 
     private Integer viewCount;
 
+    private Integer likeCount;
+
+    private Boolean isLiked = false;
+
     private Boolean publicFlag;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -40,8 +44,24 @@ public class MemeResponseDTO {
         this.imageUrl = save.getImageUrl();
         this.type = save.getType().toString();
         this.viewCount = save.getViewCount();
+        this.likeCount = save.getLikeCount();
         this.publicFlag = save.isPublicFlag();
         this.createdAt = save.getCreatedAt();
         this.updatedAt = save.getUpdatedAt();
+    }
+
+    public MemeResponseDTO(Meme meme, Boolean isLike) {
+        this.memeId = meme.getId();
+        this.name = meme.getName();
+        this.userid = meme.getUsername();
+        this.username = meme.getMember().getName();
+        this.imageUrl = meme.getImageUrl();
+        this.type = meme.getType().toString();
+        this.viewCount = meme.getViewCount();
+        this.likeCount = meme.getLikeCount();
+        this.publicFlag = meme.isPublicFlag();
+        this.createdAt = meme.getCreatedAt();
+        this.updatedAt = meme.getUpdatedAt();
+        this.isLiked = isLike;
     }
 }

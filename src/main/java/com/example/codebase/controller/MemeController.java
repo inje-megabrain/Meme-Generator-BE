@@ -1,9 +1,6 @@
 package com.example.codebase.controller;
 
-import com.example.codebase.domain.meme.dto.MemeCreateDTO;
-import com.example.codebase.domain.meme.dto.MemePageDTO;
-import com.example.codebase.domain.meme.dto.MemeResponseDTO;
-import com.example.codebase.domain.meme.dto.MemeUpdateDTO;
+import com.example.codebase.domain.meme.dto.*;
 import com.example.codebase.domain.meme.entity.MemeType;
 import com.example.codebase.domain.meme.service.MemeService;
 import com.example.codebase.util.FileUtil;
@@ -19,12 +16,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Api(value = "Meme APIs", description = "Meme APIs")
@@ -96,7 +96,8 @@ public class MemeController {
             @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
     ) {
-        MemePageDTO memeList = memeService.getMemeList(MemeType.from(type), page, size, sortDirection);
+        Optional<String> loginUsername = SecurityUtil.getCurrentUsername();
+        MemePageDTO memeList = memeService.getMemeList(MemeType.from(type), page, size, sortDirection, loginUsername);
         return new ResponseEntity(memeList, HttpStatus.OK);
     }
 
@@ -104,7 +105,8 @@ public class MemeController {
     public ResponseEntity getMeme(
             @PathVariable("memeId") Long memeId
     ) {
-        MemeResponseDTO meme = memeService.getMeme(memeId);
+        Optional<String> loginUsername = SecurityUtil.getCurrentUsername();
+        MemeResponseDTO meme = memeService.getMeme(memeId, loginUsername);
         return new ResponseEntity(meme, HttpStatus.OK);
     }
 
@@ -148,6 +150,7 @@ public class MemeController {
     }
 
 
+    @ApiOperation(value = "짤 삭제", notes = "짤 삭제")
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
     @DeleteMapping("/{memeId}")
     public ResponseEntity deleteMeme(
@@ -156,5 +159,33 @@ public class MemeController {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         memeService.deleteMeme(memeId, loginUsername);
         return new ResponseEntity("삭제되었습니다.", HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "짤 좋아요", notes = "짤 좋아요")
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @PostMapping("/{memeId}/like")
+    public ResponseEntity likeMeme(
+            @PathVariable("memeId") Long memeId
+    ) {
+        String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        MemeLikeMemberReposenDTO meme = memeService.likeMeme(memeId, loginUsername);
+        if (meme.getIsLiked()) {
+            return new ResponseEntity(meme, HttpStatus.OK);
+        }
+        return new ResponseEntity(meme, HttpStatus.NO_CONTENT);
+    }
+
+    @ApiOperation(value = "로그인한 사용자가 좋아요한 밈 전체 조회", notes = "사용자가 좋아요한 밈 전체 조회 [좋아요한 순]")
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @GetMapping("/likes")
+    public ResponseEntity getLikeMemes(
+            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
+            @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
+            @ApiParam(value = "desc, asc", defaultValue = "desc")
+            @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
+    ) {
+        String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        MemePageDTO likeMemes = memeService.getLikeMemes(loginUsername, page, size, sortDirection);
+        return new ResponseEntity(likeMemes, HttpStatus.OK);
     }
 }

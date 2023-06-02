@@ -19,7 +19,7 @@ public class SecurityUtil {
     public static Optional<String> getCurrentUsername() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null) {
+        if (authentication == null || isAnonymous()) {
             log.debug("Security Context에 인증 정보 없습니다.");
             return Optional.empty();
         }
@@ -67,8 +67,19 @@ public class SecurityUtil {
     /*
         Username을 가진 사람이 관리자 이거나, 현재 스프링 컨텍스트에 저장된 유저와 같은 사람인가(같은 스레드 요청인지)
      */
-    public static Boolean isAdminOrSameUser(String username){
+    public static Boolean isAdminOrSameUser(String username) {
         return isAdmin() || isSameUser(username, getCurrentUsername().get()) ? true : false;
     }
 
+    public static Boolean isAnonymous() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            log.debug("Security Context에 인증 정보 없습니다.");
+            return true;
+        }
+
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ANONYMOUS"));
+    }
 }
