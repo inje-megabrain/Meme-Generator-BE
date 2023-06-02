@@ -1,0 +1,2 @@
+ALTER TABLE `meme`
+    ADD COLUMN `view_count` INT(11) NOT NULL DEFAULT 0 AFTER `type`;

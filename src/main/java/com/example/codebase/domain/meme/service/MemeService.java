@@ -58,8 +58,10 @@ public class MemeService {
         return MemePageDTO.of(all, pageInfo);
     }
 
+    @Transactional
     public MemeResponseDTO getMeme(Long memeId) {
         Meme meme = memeRepository.findById(memeId).orElseThrow(() -> new IllegalArgumentException("해당 짤이 없습니다."));
+        meme.incressViewCount();
         return new MemeResponseDTO(meme);
     }
 

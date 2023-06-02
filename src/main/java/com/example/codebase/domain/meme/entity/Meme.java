@@ -32,6 +32,10 @@ public class Meme {
     @Enumerated(EnumType.STRING)
     private MemeType type;
 
+    @Builder.Default
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+
     @Column(name = "public_flag")
     private boolean publicFlag;
 
@@ -56,5 +60,9 @@ public class Meme {
     public void updatePublicFlag(boolean flag) {
         this.publicFlag = flag;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void incressViewCount() {
+        this.viewCount++;
     }
 }

@@ -22,6 +22,8 @@ public class MemeResponseDTO {
 
     private String type;
 
+    private Integer viewCount;
+
     private Boolean publicFlag;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -37,6 +39,7 @@ public class MemeResponseDTO {
         this.username = save.getMember().getName();
         this.imageUrl = save.getImageUrl();
         this.type = save.getType().toString();
+        this.viewCount = save.getViewCount();
         this.publicFlag = save.isPublicFlag();
         this.createdAt = save.getCreatedAt();
         this.updatedAt = save.getUpdatedAt();
