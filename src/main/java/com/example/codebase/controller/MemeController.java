@@ -95,7 +95,7 @@ public class MemeController {
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
             @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection,
-            @ApiParam(value = "최신순(createdAt), 좋아요순(likedCount), 조회수순(viewCount)", defaultValue = "createdAt") @RequestParam(value = "sort_type", defaultValue = "createdAt") String sortType
+            @ApiParam(value = "최신순(createdAt), 좋아요순(likeCount), 조회수순(viewCount)", defaultValue = "createdAt") @RequestParam(value = "sort_type", defaultValue = "createdAt") String sortType
     ) {
         Optional<String> loginUsername = SecurityUtil.getCurrentUsername();
         MemePageDTO memeList = memeService.getMemeList(MemeType.from(type), page, size, sortType, sortDirection, loginUsername);

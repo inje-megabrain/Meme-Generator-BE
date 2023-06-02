@@ -862,7 +862,7 @@ class MemeControllerTest {
         // when
         mockMvc.perform(
                         get("/api/meme")
-                                .param("sort_type", "likedCount")
+                                .param("sort_type", "likeCount")
 
                 )
                 .andDo(print())
