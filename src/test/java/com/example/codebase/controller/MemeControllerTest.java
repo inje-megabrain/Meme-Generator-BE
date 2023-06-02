@@ -828,4 +828,85 @@ class MemeControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+
+    @DisplayName("좋아요순 밈 전체 조회")
+    @Test
+    void 좋아요순_전체조회 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test_url")
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .likeCount(i + 5)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+
+        // when
+        mockMvc.perform(
+                        get("/api/meme")
+                                .param("sort_type", "likedCount")
+
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("조회수 순 밈 전체 조회")
+    @Test
+    void 조회수순_전체조회 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test_url")
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .viewCount(i + 5)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+
+        // when
+        mockMvc.perform(
+                        get("/api/meme")
+                                .param("sort_type", "viewCount")
+                                .param("sort_direction", "desc")
+
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
 }

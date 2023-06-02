@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import javax.validation.constraints.PositiveOrZero;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -46,8 +45,8 @@ public class MemeService {
         return new MemeResponseDTO(save);
     }
 
-    public MemePageDTO getMemeList(MemeType type, int page, int size, String sortDirection, Optional<String> loginUsername) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
+    public MemePageDTO getMemeList(MemeType type, int page, int size, String sortType, String sortDirection, Optional<String> loginUsername) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortType);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
         if (loginUsername.isPresent()) {
@@ -62,6 +61,7 @@ public class MemeService {
 
             return MemePageDTO.of(all, pageInfo);
         }
+
 
         Page<Meme> memePage = memeRepository.findAllByTypeAndPublicFlagIsTrue(type, pageRequest);
         PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
