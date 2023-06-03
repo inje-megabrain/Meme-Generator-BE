@@ -2,6 +2,7 @@ package com.example.codebase.domain.member.entity;
 
 import com.example.codebase.domain.member.entity.oauth2.oAuthProvider;
 import com.example.codebase.domain.meme.entity.Meme;
+import com.example.codebase.domain.meme.entity.MemeLikeMember;
 import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -63,6 +64,9 @@ public class Member {
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Meme> memes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemeLikeMember> memeLikeMembers;
 
     public void setAuthorities(Set<MemberAuthority> authorities) {
         this.authorities = authorities;

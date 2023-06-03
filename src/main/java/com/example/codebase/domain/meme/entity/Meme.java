@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "meme")
 @Entity
@@ -52,6 +53,9 @@ public class Meme {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "meme", cascade = CascadeType.ALL)
+    private List<MemeLikeMember> memeLikeMembers;
 
     public void update(MemeUpdateDTO dto) {
         this.name = dto.getName();
