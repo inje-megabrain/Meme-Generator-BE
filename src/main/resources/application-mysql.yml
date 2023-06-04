@@ -13,7 +13,6 @@ spring:
       use-new-id-generator-mappings: false #  Hibernate의 id 생성 전략을 그대로 사용
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.SQLServer2012Dialect
         show_sql: true
         format_sql: true
         enable_lazy_load_no_trans: true # LAZY 로드를 default로 설정

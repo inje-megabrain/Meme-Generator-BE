@@ -23,7 +23,6 @@ spring:
       ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.SQLServer2012Dialect
         show_sql: true
       format_sql: true
     defer-datasource-initialization: true

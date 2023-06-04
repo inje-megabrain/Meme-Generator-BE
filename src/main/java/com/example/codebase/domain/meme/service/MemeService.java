@@ -47,7 +47,8 @@ public class MemeService {
 
     public MemePageDTO getMemeList(MemeType type, int page, int size, String sortType, String sortDirection, Optional<String> loginUsername) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortType);
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Sort timeSort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
+        PageRequest pageRequest = PageRequest.of(page, size, sort.and(timeSort));
 
         if (loginUsername.isPresent()) {
             Member member = memberRepository.findByUsername(loginUsername.get())
