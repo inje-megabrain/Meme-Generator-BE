@@ -29,4 +29,7 @@ public interface MemeRepository extends JpaRepository<Meme, Long> {
             " FROM Meme m LEFT JOIN MemeLikeMember mlm ON m = mlm.meme" +
             " WHERE m.id = :memeId AND mlm.member = :member")
     Optional<MemeWithIsLike> findMemeWithIsLikeById(Long memeId, Member member);
+
+    @Query("SELECT m FROM Meme m WHERE m.publicFlag = true AND (m.name LIKE %:keyword% OR m.member.name LIKE %:keyword%)")
+    Page<Meme> findAllByKeyword(String keyword, Pageable pageable);
 }

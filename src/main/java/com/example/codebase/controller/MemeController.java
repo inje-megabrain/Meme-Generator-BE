@@ -91,9 +91,9 @@ public class MemeController {
     // 짤 전체 조회
     @GetMapping
     public ResponseEntity getMemeList(
-            @RequestParam(value = "type", defaultValue = "MEME") String type,
-            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
-            @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "MEME(밈), TEMPLATE(템플릿)", defaultValue = "MEME") String type,
+            @PositiveOrZero @RequestParam(value = "0", defaultValue = "0") int page,
+            @PositiveOrZero @RequestParam(value = "10", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc") @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection,
             @ApiParam(value = "최신순(createdAt), 좋아요순(likeCount), 조회수순(viewCount)", defaultValue = "createdAt") @RequestParam(value = "sort_type", defaultValue = "createdAt") String sortType
     ) {
@@ -114,10 +114,10 @@ public class MemeController {
     @GetMapping("/member/{username}")
     public ResponseEntity getMemberMeme(
             @PathVariable("username") String username,
-            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
-            @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
+            @PositiveOrZero @RequestParam(value = "0", defaultValue = "0") int page,
+            @PositiveOrZero @RequestParam(value = "10", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc")
-            @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
+            @RequestParam(value = "desc, asc", defaultValue = "desc") String sortDirection
     ) {
         MemePageDTO memeList = memeService.getMemberMeme(username, page, size, sortDirection);
         return new ResponseEntity(memeList, HttpStatus.OK);
@@ -180,13 +180,26 @@ public class MemeController {
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
     @GetMapping("/likes")
     public ResponseEntity getLikeMemes(
-            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
-            @PositiveOrZero @RequestParam(value = "size", defaultValue = "10") int size,
+            @PositiveOrZero @RequestParam(value = "0", defaultValue = "0") int page,
+            @PositiveOrZero @RequestParam(value = "10", defaultValue = "10") int size,
             @ApiParam(value = "desc, asc", defaultValue = "desc")
-            @RequestParam(value = "sort_direction", defaultValue = "desc") String sortDirection
+            @RequestParam(value = "desc, asc", defaultValue = "desc") String sortDirection
     ) {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         MemePageDTO likeMemes = memeService.getLikeMemes(loginUsername, page, size, sortDirection);
         return new ResponseEntity(likeMemes, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "짤 검색", notes = "짤 검색, 주어진 키워드에 해당하는 짤 제목명, 작성자명을 검색합니다.")
+    @GetMapping("/search")
+    public ResponseEntity searchMeme(
+            @RequestParam("keyword") String keyword,
+            @PositiveOrZero @RequestParam(value = "0", defaultValue = "0") int page,
+            @PositiveOrZero @RequestParam(value = "10", defaultValue = "10") int size,
+            @ApiParam(value = "desc, asc", defaultValue = "desc")
+            @RequestParam(value = "desc, asc", defaultValue = "desc") String sortDirection
+    ) {
+        MemePageDTO memeList = memeService.searchMeme(keyword, page, size, sortDirection);
+        return new ResponseEntity(memeList, HttpStatus.OK);
     }
 }

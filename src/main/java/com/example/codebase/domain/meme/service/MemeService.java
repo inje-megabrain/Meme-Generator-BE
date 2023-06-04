@@ -183,4 +183,18 @@ public class MemeService {
 
         return MemePageDTO.of(all, pageInfo);
     }
+
+    public MemePageDTO searchMeme(String keyword, int page, int size, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        Page<Meme> memePage = memeRepository.findAllByKeyword(keyword, pageRequest);
+        PageInfo pageInfo = PageInfo.of(page, size, memePage.getTotalPages(), memePage.getTotalElements());
+
+        List<MemeResponseDTO> all = memePage.stream()
+                .map(MemeResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return MemePageDTO.of(all, pageInfo);
+    }
 }
