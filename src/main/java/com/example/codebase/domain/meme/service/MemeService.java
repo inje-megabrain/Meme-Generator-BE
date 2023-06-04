@@ -197,4 +197,9 @@ public class MemeService {
 
         return MemePageDTO.of(all, pageInfo);
     }
+
+    public MemeCountDTO getMemeCount(String username) {
+        LikeCountWithViewCount counts = memeRepository.getCounts(username);
+        return new MemeCountDTO(counts.getViewCount(), counts.getLikeCount());
+    }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
+import javax.websocket.server.PathParam;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -210,5 +211,14 @@ public class MemeController {
     ) {
         MemePageDTO memeList = memeService.searchMeme(keyword, page, size, sortDirection);
         return new ResponseEntity(memeList, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "사용자의 총 조회수와 좋아요 수 조회", notes = "[TOKEN 필요] 총 조회수와 좋아요 수 조회")
+    @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER','ROLE_ADMIN')")
+    @GetMapping("/counts")
+    public ResponseEntity getCount() {
+        String username = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
+        MemeCountDTO memeCount = memeService.getMemeCount(username);
+        return new ResponseEntity(memeCount, HttpStatus.OK);
     }
 }

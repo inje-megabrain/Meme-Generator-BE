@@ -1,6 +1,7 @@
 package com.example.codebase.domain.meme.repository;
 
 import com.example.codebase.domain.member.entity.Member;
+import com.example.codebase.domain.meme.entity.LikeCountWithViewCount;
 import com.example.codebase.domain.meme.entity.Meme;
 import com.example.codebase.domain.meme.entity.MemeType;
 import com.example.codebase.domain.meme.entity.MemeWithIsLike;
@@ -32,4 +33,7 @@ public interface MemeRepository extends JpaRepository<Meme, Long> {
 
     @Query("SELECT m FROM Meme m WHERE m.publicFlag = true AND (m.name LIKE %:keyword% OR m.member.name LIKE %:keyword%)")
     Page<Meme> findAllByKeyword(String keyword, Pageable pageable);
+
+    @Query("SELECT SUM(m.likeCount) AS likeCount, SUM(m.viewCount) AS viewCount FROM Meme m WHERE m.publicFlag = true AND m.member.username = :username")
+    LikeCountWithViewCount getCounts(String username);
 }

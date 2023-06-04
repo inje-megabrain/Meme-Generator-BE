@@ -947,4 +947,44 @@ class MemeControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("나의 총 조회수와 좋아요수 조회 ")
+    @Test
+    void 내_조회_좋아요_수_조회 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        // given
+        List<Meme> memes = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Meme meme = Meme.builder()
+                    .name("test" + i)
+                    .member(member)
+                    .imageUrl("test_url")
+                    .type(MemeType.MEME)
+                    .publicFlag(true)
+                    .viewCount(1)
+                    .likeCount(1)
+                    .createdAt(LocalDateTime.now().minusDays(i))
+                    .build();
+            memes.add(meme);
+        }
+        memeRepository.saveAll(memes);
+
+
+        // when
+        mockMvc.perform(
+                        get("/api/meme/counts")
+
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }
