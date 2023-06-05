@@ -84,6 +84,7 @@ class MemeControllerTest {
         createDTO.setUsername(member.getUsername());
         createDTO.setName("test");
         createDTO.setType(MemeType.TEMPLATE.toString());
+        createDTO.setTags("#태그1 #태그2 #태그3");
         createDTO.setPublicFlag(true);
 
         MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
@@ -986,5 +987,66 @@ class MemeControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @WithMockCustomUser(username = "testid")
+    @DisplayName("밈 생성 시 태그 검증이 작동한다")
+    @Test
+    void 밈_태그_제한_생성() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        MemeCreateDTO createDTO = new MemeCreateDTO();
+        createDTO.setUsername(member.getUsername());
+        createDTO.setName("test");
+        createDTO.setType(MemeType.TEMPLATE.toString());
+        createDTO.setTags("#태그1 #태그2 #태그3 #태그4 #태그5 #태그6");
+        createDTO.setPublicFlag(true);
+
+        MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
+
+        // when
+        mockMvc.perform(
+                        multipart("/api/meme")
+                                .file(file)
+                                .file(new MockMultipartFile("dto", "", "application/json", objectMapper.writeValueAsString(createDTO).getBytes())
+                                ).contentType("multipart/form-data")
+                                .accept("application/json")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print()) // then
+                .andExpect(status().isBadRequest());
+
+        createDTO.setTags("");
+        mockMvc.perform(
+                        multipart("/api/meme")
+                                .file(file)
+                                .file(new MockMultipartFile("dto", "", "application/json", objectMapper.writeValueAsString(createDTO).getBytes())
+                                ).contentType("multipart/form-data")
+                                .accept("application/json")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print()) // then
+                .andExpect(status().isBadRequest());
+
+        createDTO.setTags("#wewe wsewew");
+        mockMvc.perform(
+                        multipart("/api/meme")
+                                .file(file)
+                                .file(new MockMultipartFile("dto", "", "application/json", objectMapper.writeValueAsString(createDTO).getBytes())
+                                ).contentType("multipart/form-data")
+                                .accept("application/json")
+                                .characterEncoding("UTF-8")
+                )
+                .andDo(print()) // then
+                .andExpect(status().isBadRequest());
+
+
     }
 }

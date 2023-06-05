@@ -1,0 +1,2 @@
+ALTER TABLE `meme`
+    ADD COLUMN `tags` VARCHAR(255) NULL AFTER `type`;

@@ -33,6 +33,9 @@ public class Meme {
     @Enumerated(EnumType.STRING)
     private MemeType type;
 
+    @Column(name = "tags")
+    private String tags;
+
     @Builder.Default
     @Column(name = "view_count")
     private Integer viewCount = 0;

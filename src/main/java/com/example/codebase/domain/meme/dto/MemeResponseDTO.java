@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +22,8 @@ public class MemeResponseDTO {
     private String imageUrl;
 
     private String type;
+
+    private List<String> tags;
 
     private Integer viewCount;
 
@@ -43,6 +46,7 @@ public class MemeResponseDTO {
         this.username = save.getMember().getName();
         this.imageUrl = save.getImageUrl();
         this.type = save.getType().toString();
+        this.tags = List.of(save.getTags().split(" "));
         this.viewCount = save.getViewCount();
         this.likeCount = save.getLikeCount();
         this.publicFlag = save.isPublicFlag();
@@ -51,17 +55,7 @@ public class MemeResponseDTO {
     }
 
     public MemeResponseDTO(Meme meme, Boolean isLike) {
-        this.memeId = meme.getId();
-        this.name = meme.getName();
-        this.userid = meme.getUsername();
-        this.username = meme.getMember().getName();
-        this.imageUrl = meme.getImageUrl();
-        this.type = meme.getType().toString();
-        this.viewCount = meme.getViewCount();
-        this.likeCount = meme.getLikeCount();
-        this.publicFlag = meme.isPublicFlag();
-        this.createdAt = meme.getCreatedAt();
-        this.updatedAt = meme.getUpdatedAt();
+        this(meme);
         this.isLiked = isLike;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
 import javax.websocket.server.PathParam;
@@ -47,10 +48,15 @@ public class MemeController {
     @PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity createMeme(
-            @RequestPart("dto") MemeCreateDTO dto,
-            @RequestPart("image") MultipartFile image) {
+            @Valid @RequestPart("dto") MemeCreateDTO dto,
+            @RequestPart("image") MultipartFile image) throws IOException {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         dto.setUsername(loginUsername);
+
+        int tagsSize = dto.getTags().split(" ").length;
+        if (tagsSize == 0 || tagsSize > 5) {
+            throw new RuntimeException("태그는 1~5개 입력해주세요.");
+        }
 
         // dto 확장자 추출
         String originalFilename = image.getOriginalFilename();
@@ -59,7 +65,7 @@ public class MemeController {
 
         // image 확장자 -> jpg, png, jpeg
         if (!FileUtil.checkImageExtension(ext)) {
-            return new ResponseEntity("이미지 파일만 업로드 가능합니다.", HttpStatus.BAD_REQUEST);
+            throw new RuntimeException("이미지 파일만 업로드 가능합니다.");
         }
 
         // 이미지 저장
@@ -81,7 +87,7 @@ public class MemeController {
 
             dto.setImageUrl("/images/" + now + "/" + storeFileName);
         } catch (IOException e) {
-            return new ResponseEntity("이미지 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new IOException("이미지 저장에 실패했습니다.");
         }
 
         // 짤 등록
