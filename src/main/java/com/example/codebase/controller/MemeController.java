@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
 import javax.websocket.server.PathParam;
 import java.io.File;
@@ -28,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Api(value = "Meme APIs", description = "Meme APIs")
 @RestController
@@ -53,9 +53,16 @@ public class MemeController {
         String loginUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new RuntimeException("로그인이 필요합니다."));
         dto.setUsername(loginUsername);
 
-        int tagsSize = dto.getTags().split(" ").length;
-        if (tagsSize == 0 || tagsSize > 5) {
-            throw new RuntimeException("태그는 1~5개 입력해주세요.");
+        if (dto.getType().equals("MEME")) {
+            boolean regexTags = Pattern.matches("^#[a-zA-Z0-9가-힣]{1,20}( #[a-zA-Z0-9가-힣]{1,20})*$", dto.getTags());
+            if (!regexTags) {
+                throw new RuntimeException("태그는 1~20자의 한글, 영문, 숫자로 이루어진 문자열이며, 공백으로 구분하며 최소 1개 최대 5개 입력해주세요.");
+            }
+
+            int tagsSize = dto.getTags().split(" ").length;
+            if (tagsSize == 0 || tagsSize > 5) {
+                throw new RuntimeException("밈 태그는 1~5개 입력해주세요.");
+            }
         }
 
         // dto 확장자 추출

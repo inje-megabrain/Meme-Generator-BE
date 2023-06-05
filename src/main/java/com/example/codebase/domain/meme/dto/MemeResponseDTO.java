@@ -40,13 +40,18 @@ public class MemeResponseDTO {
     private LocalDateTime updatedAt;
 
     public MemeResponseDTO(Meme save) {
+        if (save.getTags() == null) {
+            this.tags = List.of();
+        } else {
+            this.tags = List.of(save.getTags().split(" "));
+        }
         this.memeId = save.getId();
         this.name = save.getName();
         this.userid = save.getUsername();
         this.username = save.getMember().getName();
         this.imageUrl = save.getImageUrl();
         this.type = save.getType().toString();
-        this.tags = List.of(save.getTags().split(" "));
+
         this.viewCount = save.getViewCount();
         this.likeCount = save.getLikeCount();
         this.publicFlag = save.isPublicFlag();
