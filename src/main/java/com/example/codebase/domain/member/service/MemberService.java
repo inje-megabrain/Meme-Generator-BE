@@ -69,6 +69,14 @@ public class MemberService {
 
     @Transactional
     public Member createOAuthMember(OAuthAttributes oAuthAttributes) {
+        if (memberRepository.existsByOauthProvider(oAuthAttributes.getOAuthProviderId())) {
+            throw new RuntimeException("이미 가입된 회원입니다");
+        }
+
+        if (memberRepository.existsByEmail(oAuthAttributes.getEmail())) {
+            throw new RuntimeException("사용중인 이메일입니다");
+        }
+
         // New Save
         Authority authority = new Authority();
         authority.setAuthorityName("ROLE_USER");

@@ -19,6 +19,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByUsername(String username);
 
+    boolean existsByOauthProvider(String oauthProvider);
+
     boolean existsByEmail(String email);
 
     @Query("SELECT m FROM Member m WHERE m.email = :email and m.activated = :activated")
