@@ -69,7 +69,7 @@ public class MemberService {
 
     @Transactional
     public Member createOAuthMember(OAuthAttributes oAuthAttributes) {
-        if (memberRepository.existsByOauthProvider(oAuthAttributes.getOAuthProviderId())) {
+        if (memberRepository.existsByOauthProviderId(oAuthAttributes.getOAuthProviderId())) {
             throw new RuntimeException("이미 가입된 회원입니다");
         }
 
