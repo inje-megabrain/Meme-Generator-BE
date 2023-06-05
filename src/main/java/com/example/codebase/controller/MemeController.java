@@ -92,7 +92,8 @@ public class MemeController {
     // 짤 전체 조회
     @GetMapping
     public ResponseEntity getMemeList(
-            @RequestParam(value = "MEME(밈), TEMPLATE(템플릿)", defaultValue = "MEME") String type,
+            @ApiParam(value = "MEME,TEMPLATE", defaultValue = "MEME")
+            @RequestParam(value = "type", defaultValue = "MEME") String type,
             @ApiParam(value = "0", defaultValue = "0")
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
             @ApiParam(value = "10", defaultValue = "10")
