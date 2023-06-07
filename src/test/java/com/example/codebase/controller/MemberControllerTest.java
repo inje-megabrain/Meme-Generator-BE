@@ -353,4 +353,59 @@ class MemberControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
+
+    @DisplayName("이메일 중복 체크 시 ")
+    @Test
+    void 이메일_중복_체크 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("test123")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        mockMvc.perform(
+                        get("/api/member/email")
+                                .param("email", "test@test.com")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                        get("/api/member/email")
+                                .param("email", "a@test.com")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("아이디 중복 체크 시 ")
+    @Test
+    void 아이디_중복_체크 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("test123")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
+
+        mockMvc.perform(
+                        get("/api/member/username")
+                                .param("username", "test123")
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                        get("/api/member/username")
+                                .param("username", "test12")
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
 }

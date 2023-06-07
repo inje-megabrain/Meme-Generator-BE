@@ -125,4 +125,12 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
         member.updateName(newName);
     }
+
+    public boolean checkEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    public boolean checkUsername(String username) {
+        return memberRepository.existsByUsername(username);
+    }
 }

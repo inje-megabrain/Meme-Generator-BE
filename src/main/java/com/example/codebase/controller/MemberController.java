@@ -80,4 +80,23 @@ public class MemberController {
         return new ResponseEntity(loginUesrname + " 에서 " + newName + "으로 수정되었습니다", HttpStatus.OK);
     }
 
+    @ApiOperation(value = "이메일 중복 체크 API", notes = "이메일 중복 체크 API")
+    @GetMapping("/email")
+    public ResponseEntity checkEmail(@RequestParam String email) {
+        boolean isExist = memberService.checkEmail(email);
+        if (isExist) {
+            throw new RuntimeException("이미 사용중인 이메일입니다.");
+        }
+        return new ResponseEntity("사용가능한 이메일입니다.", HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "아이디 중복 체크 API", notes = "아이디 중복 체크 API")
+    @GetMapping("/username")
+    public ResponseEntity checkUsername(@RequestParam String username) {
+        boolean isExist = memberService.checkUsername(username);
+        if (isExist) {
+            throw new RuntimeException("이미 사용중인 아이디입니다.");
+        }
+        return new ResponseEntity("사용가능한 아이디입니다.", HttpStatus.OK);
+    }
 }
