@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -50,16 +51,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes oAuthAttributes = OAuthAttributes.
                 of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        Member member = saveOrUpdate(oAuthAttributes);
+        try {
+            Member member = saveOrUpdate(oAuthAttributes);
 
-        List<SimpleGrantedAuthority> simpleGrantedAuthorityList = new ArrayList<>();
-        for (MemberAuthority memberAuthority : member.getAuthorities()) {
-            simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(memberAuthority.getAuthority().getAuthorityName()));
+            List<SimpleGrantedAuthority> simpleGrantedAuthorityList = new ArrayList<>();
+            for (MemberAuthority memberAuthority : member.getAuthorities()) {
+                simpleGrantedAuthorityList.add(new SimpleGrantedAuthority(memberAuthority.getAuthority().getAuthorityName()));
+            }
+            return new DefaultOAuth2User(simpleGrantedAuthorityList,
+                    oAuthAttributes.getAttributes(),
+                    oAuthAttributes.getNameAttributeKey());
+        } catch (RuntimeException e) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("oauth2_runtime_error"), e.getMessage());
         }
-
-        return new DefaultOAuth2User(simpleGrantedAuthorityList,
-                oAuthAttributes.getAttributes(),
-                oAuthAttributes.getNameAttributeKey());
     }
 
     private Member saveOrUpdate(OAuthAttributes oAuthAttributes) {
