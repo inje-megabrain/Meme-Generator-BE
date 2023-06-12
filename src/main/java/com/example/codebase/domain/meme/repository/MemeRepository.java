@@ -31,7 +31,7 @@ public interface MemeRepository extends JpaRepository<Meme, Long> {
             " WHERE m.id = :memeId AND mlm.member = :member")
     Optional<MemeWithIsLike> findMemeWithIsLikeById(Long memeId, Member member);
 
-    @Query("SELECT m FROM Meme m WHERE m.publicFlag = true AND (m.name LIKE %:keyword% OR m.member.name LIKE %:keyword%)")
+    @Query("SELECT m FROM Meme m WHERE m.publicFlag = true AND m.type = 'MEME' AND (m.name LIKE %:keyword% OR m.member.name LIKE %:keyword% OR m.tags LIKE %:keyword%)")
     Page<Meme> findAllByKeyword(String keyword, Pageable pageable);
 
     @Query("SELECT SUM(m.likeCount) AS likeCount, SUM(m.viewCount) AS viewCount FROM Meme m WHERE m.publicFlag = true AND m.member.username = :username")

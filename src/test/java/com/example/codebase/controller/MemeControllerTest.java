@@ -1098,7 +1098,39 @@ class MemeControllerTest {
                 )
                 .andDo(print()) // then
                 .andExpect(status().isBadRequest());
+    }
 
+    @DisplayName("태그 검색이 작동한다")
+    @Test
+    public void 태그_검색이_작동한다 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("test@test.com")
+                .name("test")
+                .username("testid")
+                .password("1234")
+                .build();
+        memberRepository.save(member);
 
+        Meme meme = Meme.builder()
+                .name("test")
+                .member(member)
+                .imageUrl("test_url")
+                .type(MemeType.MEME)
+                .tags("#태그1 #태그2 #태그3 #태그4 #태그5 #태그6")
+                .publicFlag(true)
+                .viewCount(10)
+                .createdAt(LocalDateTime.now())
+                .build();
+        memeRepository.save(meme);
+
+        // when
+        mockMvc.perform(
+                        get("/api/meme/search")
+                                .param("keyword", "#태그4")
+
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
